@@ -98,8 +98,8 @@ InterfaceProc::InterfaceProc()
 void InterfaceProc::Parameter_setting(const int x){
 ////////////////////////////////HSV設定///////////////////////////////////////////
 	HSV_init[0] = 0; HSV_init[1] = 360;
-    HSV_init[2] = 0; HSV_init[3] = 255;
-    HSV_init[4] = 0; HSV_init[5] = 255;
+  HSV_init[2] = 0; HSV_init[3] = 255;
+  HSV_init[4] = 0; HSV_init[5] = 255;
 
 	nh.setParam("Colormode",ColorModeMsg);
 	if(nh.hasParam("Colormode")){
@@ -189,7 +189,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                  smax = BallHSVBoxMsg[3];
                  smin = BallHSVBoxMsg[2];
                  vmax = BallHSVBoxMsg[5];
-                 vmin= BallHSVBoxMsg[4];
+                 vmin = BallHSVBoxMsg[4];
                 break;
             case 1:
                 hmax = GreenHSVBoxMsg[1];
@@ -197,7 +197,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                 smax = GreenHSVBoxMsg[3];
                 smin = GreenHSVBoxMsg[2];
                 vmax = GreenHSVBoxMsg[5];
-                vmin= GreenHSVBoxMsg[4];
+                vmin = GreenHSVBoxMsg[4];
                 break;
             case 2:
                 hmax = BlueHSVBoxMsg[1];
@@ -205,7 +205,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                 smax = BlueHSVBoxMsg[3];
                 smin = BlueHSVBoxMsg[2];
                 vmax = BlueHSVBoxMsg[5];
-                vmin= BlueHSVBoxMsg[4];
+                vmin = BlueHSVBoxMsg[4];
                 break;
             case 3:
                 hmax = YellowHSVBoxMsg[1];
@@ -213,15 +213,15 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                 smax = YellowHSVBoxMsg[3];
                 smin = YellowHSVBoxMsg[2];
                 vmax = YellowHSVBoxMsg[5];
-                vmin= YellowHSVBoxMsg[3];
+                vmin = YellowHSVBoxMsg[3];
                 break;
             case 4:
                 hmax = WhiteHSVBoxMsg[1];
                 hmin = WhiteHSVBoxMsg[0];
                 smax = WhiteHSVBoxMsg[3];
-                smin =WhiteHSVBoxMsg[2];
+                smin = WhiteHSVBoxMsg[2];
                 vmax = WhiteHSVBoxMsg[5];
-                vmin= WhiteHSVBoxMsg[4];
+                vmin = WhiteHSVBoxMsg[4];
                 break;
             }
 

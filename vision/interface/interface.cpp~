@@ -97,12 +97,12 @@ InterfaceProc::InterfaceProc()
 } 
 void InterfaceProc::Parameter_setting(const int x){
 ////////////////////////////////HSV設定///////////////////////////////////////////
-	/*HSV_init[0] = 0; HSV_init[1] = 360;
+	HSV_init[0] = 0; HSV_init[1] = 360;
     HSV_init[2] = 0; HSV_init[3] = 255;
-    HSV_init[4] = 0; HSV_init[5] = 255;*/
+    HSV_init[4] = 0; HSV_init[5] = 255;
 
-	//nh.setParam("Colormode",ColorModeMsg);
-	//if(nh.hasParam("Colormode")){
+	nh.setParam("Colormode",ColorModeMsg);
+	if(nh.hasParam("Colormode")){
 		for(int i=0;i<6;i++){
 
 			HSV_red.push_back(BallHSVBoxMsg[i]);  HSV_green.push_back(BlueHSVBoxMsg[i]);
@@ -115,7 +115,7 @@ void InterfaceProc::Parameter_setting(const int x){
 			
 	//	}
 /////////////////////////////////掃瞄點前置參數///////////////////////////////////
-	/*scan_para[0].push_back(Angle_Near_GapMsg);
+	scan_para[0].push_back(Angle_Near_GapMsg);
 	scan_para[1].push_back(Magn_Near_GapMsg);
 	scan_para[2].push_back(Magn_Near_StartMsg);
 	scan_para[3].push_back(Magn_Middle_StartMsg);
@@ -126,7 +126,7 @@ void InterfaceProc::Parameter_setting(const int x){
 	scan_para[8].push_back(Dont_Search_Angle_3Msg);
 	scan_para[9].push_back(Angle_range_1Msg);
 	scan_para[10].push_back(Angle_range_2_3Msg);
-	nh.setParam("scan_para",scan_para);*/
+	nh.setParam("scan_para",scan_para);
 ///////////////////////////////////////////////////////////////////////////////////////
 
 }
@@ -159,10 +159,10 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 
 	cv::waitKey(3);
 /////////////////////////FPS設定///////////////////////////////////////	
-	/*EndTime = ros::Time::now().toNSec();
+	EndTime = ros::Time::now().toNSec();
 	fpsmsg = 1000000000/(EndTime - StartTime);
     camera.msg = fpsmsg;
-	nh.setParam("FPS",fpsmsg);*/
+	nh.setParam("FPS",fpsmsg);
 
 //////////////////////////////////////////////////////////////////////
 }
