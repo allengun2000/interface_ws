@@ -7,6 +7,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <vision/parameterbutton.h>
 
 class InterfaceProc
 {
@@ -15,6 +16,7 @@ private:
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
 	image_transport::Publisher image_pub_threshold_;
+	ros::Subscriber s1;
 
 	cv::Mat *frame;
 	cv::Mat *gray;
@@ -24,5 +26,6 @@ public:
   ~InterfaceProc();
 
 	void imageCb(const sensor_msgs::ImageConstPtr&);
-	cv::Mat Gray(cv::Mat iframe);
+	void ParameterButtonCall(const vision::parameterbutton::ConstPtr&);
+	cv::Mat Gray(const cv::Mat iframe);
 };

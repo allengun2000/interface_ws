@@ -6,6 +6,11 @@
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
 
+void InterfaceProc::ParameterButtonCall (const vision::parameterbutton msg)
+{
+	ROS_INFO("I heard: [%d]", msg.button);
+}
+
 InterfaceProc::InterfaceProc()
 	:it_(nh)
 {
@@ -13,6 +18,7 @@ InterfaceProc::InterfaceProc()
 
 	image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
 	image_pub_threshold_ = it_.advertise("/interface/image_raw/threshold", 1);
+	s1 = nh.subscribe("/interface/parameterbutton", 1000, &InterfaceProc::ParameterButtonCall, this);
 
 	cv::namedWindow(OPENCV_WINDOW, CV_WINDOW_AUTOSIZE);
 	frame = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
@@ -52,12 +58,12 @@ cv::Mat InterfaceProc::Gray(const cv::Mat iframe)
 	int gray;
 	for (int h = 0; h < iframe.rows; h++) {
 		for (int w = 0; w < iframe.cols; w++) {
-			gray = (iframe.data[(h*iframe.cols)+w+0] +
-							iframe.data[(h*iframe.cols)+w+1] +
-							iframe.data[(h*iframe.cols)+w+2])/3;
-			oframe.data[(h*iframe.cols)+w+0] = gray;
-			oframe.data[(h*iframe.cols)+w+1] = gray;
-			oframe.data[(h*iframe.cols)+w+2] = gray;
+			gray = (iframe.data[(h*iframe.cols*3)+(w*3)+0] +
+							iframe.data[(h*iframe.cols*3)+(w*3)+1] +
+							iframe.data[(h*iframe.cols*3)+(w*3)+2])/3;
+			oframe.data[(h*iframe.cols*3)+(w*3)+0] = gray;
+			oframe.data[(h*iframe.cols*3)+(w*3)+1] = gray;
+			oframe.data[(h*iframe.cols*3)+(w*3)+2] = gray;
 		}
 	}
 	return oframe;

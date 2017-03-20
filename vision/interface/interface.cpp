@@ -6,6 +6,11 @@
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
 
+void InterfaceProc::ParameterButtonCall (const vision::parameterbutton msg)
+{
+	std::cout<<msg.button<<std::endl;
+}
+
 InterfaceProc::InterfaceProc()
 	:it_(nh)
 {
@@ -13,6 +18,7 @@ InterfaceProc::InterfaceProc()
 
 	image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
 	image_pub_threshold_ = it_.advertise("/interface/image_raw/threshold", 1);
+	s1 = nh.subscribe("/interface/parameterbutton", 1000, &InterfaceProc::ParameterButtonCall, this);
 
 	cv::namedWindow(OPENCV_WINDOW, CV_WINDOW_AUTOSIZE);
 	frame = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
