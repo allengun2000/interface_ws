@@ -1,10 +1,12 @@
+#define PI 3.14159265
 #include "interface.hpp"
 #include "math.h"
-#define PI 3.14159265
 #define FRAME_COLS 640
 #define FRAME_ROWS 480
+#define IMAGE_TEST1 "/home/allen/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
+
 
 void InterfaceProc::ParameterButtonCall (const vision::parameterbutton msg)
 {
@@ -35,7 +37,7 @@ void InterfaceProc::colorcall(const vision::color msg){
          WhiteHSVBoxMsg[i]=msg.WhiteHSVBox[i];
          break;
      }
-    std::cout<<BallHSVBoxMsg[3]<<std::endl;
+    //std::cout<<BallHSVBoxMsg[3]<<std::endl;
 
 }
 void InterfaceProc::centercall(const vision::center msg){
@@ -89,14 +91,14 @@ InterfaceProc::InterfaceProc()
     s7 = nh.subscribe("interface/colorbutton", 1000, &InterfaceProc::colorbuttoncall,this);
     s8 = nh.subscribe("interface/scan", 1000, &InterfaceProc::scancall,this);
 	cv::namedWindow(OPENCV_WINDOW, CV_WINDOW_AUTOSIZE);
-	frame = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
-	gray = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
+    frame=new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
+    ColorModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
 } 
 
 InterfaceProc::~InterfaceProc()
 {
 	delete frame;
-	delete gray;
+    delete ColorModels;
 	cv::destroyWindow(OPENCV_WINDOW);
 }
 
@@ -111,28 +113,83 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 	}
 
 	*frame = cv_ptr->image;
-	*gray = Gray(*frame);
+    *ColorModels =ColorModel(*frame);
 
 	// Image Output
-	cv::imshow(OPENCV_WINDOW, *gray);
+    cv::imshow(OPENCV_WINDOW, *ColorModels);
 //	sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "mono16", *thresholdImg16).toImageMsg();
 //	image_pub_threshold_.publish(thresholdMsg);
 
   cv::waitKey(3);
 }
-cv::Mat InterfaceProc::Gray(const cv::Mat iframe)
+cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
 {
 	static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
-	int gray;
-	for (int h = 0; h < iframe.rows; h++) {
-		for (int w = 0; w < iframe.cols; w++) {
-			gray = (iframe.data[(h*iframe.cols*3)+(w*3)+0] +
-							iframe.data[(h*iframe.cols*3)+(w*3)+1] +
-							iframe.data[(h*iframe.cols*3)+(w*3)+2])/3;
-			oframe.data[(h*iframe.cols*3)+(w*3)+0] = gray;
-			oframe.data[(h*iframe.cols*3)+(w*3)+1] = gray;
-			oframe.data[(h*iframe.cols*3)+(w*3)+2] = gray;
+    for (int i = 0; i < iframe.rows; i++) {
+        for (int j = 0; j < iframe.cols; j++) {
+            double B = iframe.data[(i*iframe.cols*3)+(j*3)+0]+0;
+            double G = iframe.data[(i*iframe.cols*3)+(j*3)+1]+0;
+            double R = iframe.data[(i*iframe.cols*3)+(j*3)+2]+0;
+            double H,S,V;
+            V =(max(R,G)>max(G,B))?max(R,G):max(G,B);   //max(R,G,B);
+            double mn=(min(R,G)<min(G,B))?min(R,G):min(G,B);//min(R,G,B);
+            if(R==V){H=(G-B)*60/(V-mn);}
+            if(G==V){H=120+(B-R)*60/(V-mn);}
+            if(B==V){H=240+(R-G)*60/(V-mn);}
+            if(H<0){H=H+360;}
+            S=(((V-mn)*100)/V);
+            switch(ColorModeMsg){
+            case 0:
+                 hmax = BallHSVBoxMsg[1];
+                 hmin = BallHSVBoxMsg[0];
+                 smax = BallHSVBoxMsg[3];
+                 smin = BallHSVBoxMsg[2];
+                 vmax = BallHSVBoxMsg[5];
+                 vmin= BallHSVBoxMsg[4];
+                break;
+            case 1:
+                hmax = GreenHSVBoxMsg[1];
+                hmin = GreenHSVBoxMsg[0];
+                smax = GreenHSVBoxMsg[3];
+                smin = GreenHSVBoxMsg[2];
+                vmax = GreenHSVBoxMsg[5];
+                vmin= GreenHSVBoxMsg[4];
+                break;
+            case 2:
+                hmax = BlueHSVBoxMsg[1];
+                hmin = BlueHSVBoxMsg[0];
+                smax = BlueHSVBoxMsg[3];
+                smin = BlueHSVBoxMsg[2];
+                vmax = BlueHSVBoxMsg[5];
+                vmin= BlueHSVBoxMsg[4];
+                break;
+            case 3:
+                hmax = YellowHSVBoxMsg[1];
+                hmin = YellowHSVBoxMsg[0];
+                smax = YellowHSVBoxMsg[3];
+                smin = YellowHSVBoxMsg[2];
+                vmax = YellowHSVBoxMsg[5];
+                vmin= YellowHSVBoxMsg[3];
+                break;
+            case 4:
+                hmax = WhiteHSVBoxMsg[1];
+                hmin = WhiteHSVBoxMsg[0];
+                smax = WhiteHSVBoxMsg[3];
+                smin =WhiteHSVBoxMsg[2];
+                vmax = WhiteHSVBoxMsg[5];
+                vmin= WhiteHSVBoxMsg[4];
+                break;
+            }
+
+         if((H<=hmax)&&(S<=smax)&&(V<=vmax)&&(H>=hmin)&&(S>=smin )&&(V>=vmin) ){
+            oframe.data[(i*iframe.cols*3)+(j*3)+0] = 0;
+            oframe.data[(i*iframe.cols*3)+(j*3)+1] = 0;
+            oframe.data[(i*iframe.cols*3)+(j*3)+2] = 0;}else{
+             oframe.data[(i*iframe.cols*3)+(j*3)+0]=iframe.data[(i*iframe.cols*3)+(j*3)+0];
+             oframe.data[(i*iframe.cols*3)+(j*3)+1]=iframe.data[(i*iframe.cols*3)+(j*3)+1];
+             oframe.data[(i*iframe.cols*3)+(j*3)+2]=iframe.data[(i*iframe.cols*3)+(j*3)+2] ;
+         }
 		}
-	}
+    }
 	return oframe;
 }

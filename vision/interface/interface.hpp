@@ -34,8 +34,8 @@ private:
     ros::Subscriber s8;
 
 	cv::Mat *frame;
-	cv::Mat *gray;
-
+    cv::Mat *ColorModels;
+ int hmax,hmin,smax,smin,vmax,vmin;
 public:
   InterfaceProc();
   ~InterfaceProc();
@@ -78,5 +78,5 @@ public:
     void blackcall(const vision::black);
     void colorbuttoncall(const vision::colorbutton);
     void scancall(const vision::scan);
-	cv::Mat Gray(const cv::Mat iframe);
+    cv::Mat ColorModel(const cv::Mat iframe);
 };
