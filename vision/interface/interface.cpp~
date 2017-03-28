@@ -211,7 +211,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
          }
 		}
     }
-	system("rosparam dump ~/interface_ws/src/test.yaml");
+	system("rosparam dump ~/interface_ws/test.yaml");
 	return oframe;
 }
 
