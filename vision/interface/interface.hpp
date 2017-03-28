@@ -84,12 +84,15 @@ public:
     int distance_space[100];
     int distance_pixel[100];
     int HSV_init[6];
+
     std::vector<int>scan_para;
     std::vector<int>scan_near;
     std::vector<int>scan_middle;
     std::vector<int>scan_far;
+
     std::vector<int>dis_space;
     std::vector<int>dis_pixel;
+
     std::vector<int> HSV_red;
     std::vector<int> HSV_green;
     std::vector<int> HSV_blue;

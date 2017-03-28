@@ -131,6 +131,14 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 			nh.setParam("/HSV/Green",HSV_green);
 			}
 		}
+/////////////////////////////////掃瞄點前置參數///////////////////////////////////
+	scan_para[0].push_back(Angle_Near_GapMsg);
+	scan_para[1].push_back(Magn_Near_GapMsg);
+	scan_para[2].push_back(Magn_Near_StartMsg);
+	scan_para[3].push_back(Magn_Middle_StartMsg);
+	scan_para[4].push_back(Magn_Far_StartMsg);
+	scan_para[5].push_back(Magn_Far_EndMsg);
+
 
 	*frame = cv_ptr->image;
     *ColorModels =ColorModel(*frame);

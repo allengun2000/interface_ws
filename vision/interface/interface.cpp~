@@ -131,6 +131,14 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 			nh.setParam("/HSV/Green",HSV_green);
 			}
 		}
+/////////////////////////////////掃瞄點前置參數///////////////////////////////////
+	scan_para.push_back(Angle_Near_GapMsg);
+	Magn_Near_GapMsg=msg.Magn_Near_Gap;
+	Magn_Near_StartMsg=msg.Magn_Near_Start;
+	Magn_Middle_StartMsg=msg.Magn_Middle_Start;
+	Magn_Far_StartMsg=msg.Magn_Far_Start;
+	Magn_Far_EndMsg=msg.Magn_Far_End;
+
 
 	*frame = cv_ptr->image;
     *ColorModels =ColorModel(*frame);
@@ -211,7 +219,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
          }
 		}
     }
-	system("rosparam dump ~/interface_ws/test.yaml");
+	system("rosparam dump ~/interface_ws/src/test.yaml");
 	return oframe;
 }
 
