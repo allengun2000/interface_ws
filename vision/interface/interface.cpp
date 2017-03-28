@@ -3,6 +3,10 @@
 #include "math.h"
 #define FRAME_COLS 640
 #define FRAME_ROWS 480
+<<<<<<< HEAD
+=======
+#define IMAGE_TEST1 "/home/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
+>>>>>>> dbe28fc8fd2659b91b894f2ab20fee59f7a52870
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
 
@@ -61,6 +65,7 @@ void InterfaceProc::blackcall(const vision::black msg){
 void InterfaceProc::colorbuttoncall(const vision::colorbutton msg){
  colorbottonMsg=msg.button;
 }
+
 void InterfaceProc::scancall(const vision::scan msg){
 Angle_Near_GapMsg=msg.Angle_Near_Gap;
 Magn_Near_GapMsg=msg.Magn_Near_Gap;
@@ -77,7 +82,7 @@ Angle_range_2_3Msg=msg.Angle_range_2_3;
 InterfaceProc::InterfaceProc()
 	:it_(nh)
 {
-	ros::NodeHandle n("~");
+	ros::NodeHandle nh("~");
 
 	image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
 	image_pub_threshold_ = it_.advertise("/interface/image_raw/threshold", 1);
@@ -93,7 +98,41 @@ InterfaceProc::InterfaceProc()
     frame=new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
     ColorModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
 } 
+void InterfaceProc::Parameter_setting(const int x){
+////////////////////////////////HSV設定///////////////////////////////////////////
+	HSV_init[0] = 0; HSV_init[1] = 360;
+    HSV_init[2] = 0; HSV_init[3] = 255;
+    HSV_init[4] = 0; HSV_init[5] = 255;
+	//HSV_init={0, 360, 0, 255, 0, 255};
+	nh.setParam("Colormode",ColorModeMsg);
+	if(nh.hasParam("Colormode")){
+		for(int i=0;i<6;i++){
 
+			HSV_red.push_back(BallHSVBoxMsg[i]);  HSV_green.push_back(BlueHSVBoxMsg[i]);
+            HSV_blue.push_back(GreenHSVBoxMsg[i]); HSV_yellow.push_back(YellowHSVBoxMsg[i]);
+			}
+			nh.setParam("/HSV/Ball",HSV_red);
+			nh.setParam("/HSV/Blue",HSV_blue);
+			nh.setParam("/HSV/Yellow",HSV_yellow);
+			nh.setParam("/HSV/Green",HSV_green);
+			
+
+/////////////////////////////////掃瞄點前置參數///////////////////////////////////
+	scan_para[0].push_back(Angle_Near_GapMsg);
+	scan_para[1].push_back(Magn_Near_GapMsg);
+	scan_para[2].push_back(Magn_Near_StartMsg);
+	scan_para[3].push_back(Magn_Middle_StartMsg);
+	scan_para[4].push_back(Magn_Far_StartMsg);
+	scan_para[5].push_back(Magn_Far_EndMsg);
+	scan_para[6].push_back(Dont_Search_Angle_1Msg);
+	scan_para[7].push_back(Dont_Search_Angle_2Msg);
+	scan_para[8].push_back(Dont_Search_Angle_3Msg);
+	scan_para[9].push_back(Angle_range_1Msg);
+	scan_para[10].push_back(Angle_range_2_3Msg);
+	nh.setParam("scan_para",scan_para);
+///////////////////////////////////////////////////////////////////////////////////////
+
+}
 InterfaceProc::~InterfaceProc()
 {
 	delete frame;
@@ -103,6 +142,8 @@ InterfaceProc::~InterfaceProc()
 
 void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 {
+	
+	StartTime = ros::Time::now().toNSec();
 	cv_bridge::CvImagePtr cv_ptr;
 	try {
 		cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
@@ -119,7 +160,14 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 //	sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "mono16", *thresholdImg16).toImageMsg();
 //	image_pub_threshold_.publish(thresholdMsg);
 
-  cv::waitKey(3);
+	cv::waitKey(3);
+/////////////////////////FPS設定///////////////////////////////////////	
+	EndTime = ros::Time::now().toNSec();
+	fpsmsg = 1000000000/(EndTime - StartTime);
+    camera.msg = fpsmsg;
+	nh.setParam("FPS",fpsmsg);
+
+//////////////////////////////////////////////////////////////////////
 }
 cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
 {
@@ -179,6 +227,37 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                 vmin= WhiteHSVBoxMsg[4];
                 break;
             }
+
+         if((H<=hmax)&&(S<=smax)&&(V<=vmax)&&(H>=hmin)&&(S>=smin )&&(V>=vmin) ){
+            oframe.data[(i*iframe.cols*3)+(j*3)+0] = 0;
+            oframe.data[(i*iframe.cols*3)+(j*3)+1] = 0;
+            oframe.data[(i*iframe.cols*3)+(j*3)+2] = 0;}else{
+             oframe.data[(i*iframe.cols*3)+(j*3)+0]=iframe.data[(i*iframe.cols*3)+(j*3)+0];
+             oframe.data[(i*iframe.cols*3)+(j*3)+1]=iframe.data[(i*iframe.cols*3)+(j*3)+1];
+             oframe.data[(i*iframe.cols*3)+(j*3)+2]=iframe.data[(i*iframe.cols*3)+(j*3)+2] ;
+         }
+		}
+    }
+	return oframe;
+}
+
+cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
+{
+	static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
+    for (int i = 0; i < iframe.rows; i++) {
+        for (int j = 0; j < iframe.cols; j++) {
+            double B = iframe.data[(i*iframe.cols*3)+(j*3)+0]+0;
+            double G = iframe.data[(i*iframe.cols*3)+(j*3)+1]+0;
+            double R = iframe.data[(i*iframe.cols*3)+(j*3)+2]+0;
+            double H,S,V;
+            V =(max(R,G)>max(G,B))?max(R,G):max(G,B);   //max(R,G,B);
+            double mn=(min(R,G)<min(G,B))?min(R,G):min(G,B);//min(R,G,B);
+            if(R==V){H=(G-B)*60/(V-mn);}
+            if(G==V){H=120+(B-R)*60/(V-mn);}
+            if(B==V){H=240+(R-G)*60/(V-mn);}
+            if(H<0){H=H+360;}
+            S=(((V-mn)*100)/V);
+
 
          if((H<=hmax)&&(S<=smax)&&(V<=vmax)&&(H>=hmin)&&(S>=smin )&&(V>=vmin) ){
             oframe.data[(i*iframe.cols*3)+(j*3)+0] = 0;
