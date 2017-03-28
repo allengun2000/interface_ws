@@ -35,7 +35,6 @@ private:
 
 	cv::Mat *frame;
     cv::Mat *ColorModels;
-	cv::Mat *centermats;
  int hmax,hmin,smax,smin,vmax,vmin;
 public:
   InterfaceProc();

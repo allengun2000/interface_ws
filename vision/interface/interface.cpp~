@@ -3,6 +3,7 @@
 #include "math.h"
 #define FRAME_COLS 640
 #define FRAME_ROWS 480
+#define IMAGE_TEST1 "/home/allen/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
 
