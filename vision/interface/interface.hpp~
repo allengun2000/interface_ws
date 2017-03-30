@@ -34,6 +34,7 @@ private:
     ros::Subscriber s8;
 
 	int StartTime,EndTime;
+	double fps;
     int core_num;
     int fps_num[100];
     int fps_avg;
