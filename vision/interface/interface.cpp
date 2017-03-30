@@ -1,8 +1,8 @@
 #define PI 3.14159265
 #include "interface.hpp"
 #include "math.h"
-#define FRAME_COLS 640
-#define FRAME_ROWS 480
+#define FRAME_COLS 640 //width x695
+#define FRAME_ROWS 480//height y493
 #define IMAGE_TEST1 "/home/allen/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
@@ -81,7 +81,7 @@ InterfaceProc::InterfaceProc()
 	ros::NodeHandle n("~");
 
 	image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
-	image_pub_threshold_ = it_.advertise("/interface/image_raw/threshold", 1);
+    image_pub_threshold_ = it_.advertise("/camera/image", 1);
 	s1 = nh.subscribe("/interface/parameterbutton", 1000, &InterfaceProc::ParameterButtonCall, this);
     s2 = nh.subscribe("interface/color", 1000, &InterfaceProc::colorcall,this);
     s3 = nh.subscribe("interface/center", 1000, &InterfaceProc::centercall,this);
@@ -93,12 +93,14 @@ InterfaceProc::InterfaceProc()
 	cv::namedWindow(OPENCV_WINDOW, CV_WINDOW_AUTOSIZE);
     frame=new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
     ColorModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
+    CenterModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
 } 
 
 InterfaceProc::~InterfaceProc()
 {
 	delete frame;
     delete ColorModels;
+    delete CenterModels;
 	cv::destroyWindow(OPENCV_WINDOW);
 }
 
@@ -113,12 +115,21 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 	}
 
 	*frame = cv_ptr->image;
-    *ColorModels =ColorModel(*frame);
+   switch(buttonmsg){
+     case 2:
+       *CenterModels=CenterModel(*frame);
+        cv::imshow(OPENCV_WINDOW, *CenterModels);
+    break;
+     case 4:
+        *ColorModels =ColorModel(*frame);
+          cv::imshow(OPENCV_WINDOW, *ColorModels);
+    break;
+  }
 
-	// Image Output
-    cv::imshow(OPENCV_WINDOW, *ColorModels);
-//	sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "mono16", *thresholdImg16).toImageMsg();
-//	image_pub_threshold_.publish(thresholdMsg);
+
+
+    sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", *CenterModels).toImageMsg();
+    image_pub_threshold_.publish(thresholdMsg);
 
   cv::waitKey(3);
 }
@@ -192,4 +203,13 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
 		}
     }
 	return oframe;
+}
+cv::Mat InterfaceProc::CenterModel(const cv::Mat iframe){
+
+   static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
+ oframe=iframe;
+   circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)), 10, Scalar(0,255,0), 1);
+
+return oframe;
+
 }

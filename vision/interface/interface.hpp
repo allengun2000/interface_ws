@@ -1,3 +1,6 @@
+#include <cstdio>
+#include <opencv2/opencv.hpp>
+#include <math.h>
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
@@ -17,6 +20,7 @@
 #include "vision/color.h"
 #include <stdio.h>
 #include <stdlib.h>
+using namespace cv;
 class InterfaceProc
 {
 private:
@@ -35,6 +39,7 @@ private:
 
 	cv::Mat *frame;
     cv::Mat *ColorModels;
+    cv::Mat *CenterModels;
  int hmax,hmin,smax,smin,vmax,vmin;
 public:
   InterfaceProc();
@@ -79,4 +84,5 @@ public:
     void colorbuttoncall(const vision::colorbutton);
     void scancall(const vision::scan);
     cv::Mat ColorModel(const cv::Mat iframe);
+    cv::Mat CenterModel(const cv::Mat iframe);
 };
