@@ -6,6 +6,7 @@
 #define IMAGE_TEST1 "/home/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
+const double ALPHA = 0.5;
 
 
 void InterfaceProc::ParameterButtonCall (const vision::parameterbutton msg)
@@ -53,7 +54,7 @@ void InterfaceProc::whitecall(const vision::white msg){
     WhiteAngleMsg=msg.Angle;
 }
 void InterfaceProc::cameracall(const vision::camera msg){
-fpsMsg=msg.fps;
+	fpsMsg=msg.fps;
 }
 void InterfaceProc::blackcall(const vision::black msg){
     BlackGrayMsg=msg.Gray;
@@ -97,38 +98,45 @@ InterfaceProc::InterfaceProc()
 } 
 void InterfaceProc::Parameter_setting(const int x){
 ////////////////////////////////HSV設定///////////////////////////////////////////
-	/*HSV_init[0] = 0; HSV_init[1] = 360;
+	HSV_init[0] = 0; HSV_init[1] = 360;
     HSV_init[2] = 0; HSV_init[3] = 255;
-    HSV_init[4] = 0; HSV_init[5] = 255;*/
+    HSV_init[4] = 0; HSV_init[5] = 255;
 
-	//nh.setParam("Colormode",ColorModeMsg);
-	//if(nh.hasParam("Colormode")){
+	nh.setParam("Colormode",ColorModeMsg);
+	if(nh.hasParam("Colormode")){
 		for(int i=0;i<6;i++){
 
 			HSV_red.push_back(BallHSVBoxMsg[i]);  HSV_green.push_back(BlueHSVBoxMsg[i]);
             HSV_blue.push_back(GreenHSVBoxMsg[i]); HSV_yellow.push_back(YellowHSVBoxMsg[i]);
 			}
-			nh.setParam("/HSV/Ball",HSV_red);
-			nh.setParam("/HSV/Blue",HSV_blue);
-			nh.setParam("/HSV/Yellow",HSV_yellow);
-			nh.setParam("/HSV/Green",HSV_green);
-			
-	//	}
-/////////////////////////////////掃瞄點前置參數///////////////////////////////////
-	/*scan_para[0].push_back(Angle_Near_GapMsg);
-	scan_para[1].push_back(Magn_Near_GapMsg);
-	scan_para[2].push_back(Magn_Near_StartMsg);
-	scan_para[3].push_back(Magn_Middle_StartMsg);
-	scan_para[4].push_back(Magn_Far_StartMsg);
-	scan_para[5].push_back(Magn_Far_EndMsg);
-	scan_para[6].push_back(Dont_Search_Angle_1Msg);
-	scan_para[7].push_back(Dont_Search_Angle_2Msg);
-	scan_para[8].push_back(Dont_Search_Angle_3Msg);
-	scan_para[9].push_back(Angle_range_1Msg);
-	scan_para[10].push_back(Angle_range_2_3Msg);
-	nh.setParam("scan_para",scan_para);*/
-///////////////////////////////////////////////////////////////////////////////////////
+		}
+		else{
+			for(int i=0;i<6;i++){
 
+			HSV_red.push_back(HSV_init[i]);  HSV_green.push_back(HSV_init[i]);
+      	  	HSV_blue.push_back(HSV_init[i]); HSV_yellow.push_back(HSV_init[i]);
+			}
+		}
+	nh.setParam("/HSV/Ball",HSV_red);
+	nh.setParam("/HSV/Blue",HSV_blue);
+	nh.setParam("/HSV/Yellow",HSV_yellow);
+	nh.setParam("/HSV/Green",HSV_green);
+/////////////////////////////////掃瞄點前置參數///////////////////////////////////
+	scan_para.push_back(Angle_Near_GapMsg);
+	scan_para.push_back(Magn_Near_GapMsg);
+	scan_para.push_back(Magn_Near_StartMsg);
+	scan_para.push_back(Magn_Middle_StartMsg);
+	scan_para.push_back(Magn_Far_StartMsg);
+	scan_para.push_back(Magn_Far_EndMsg);
+	scan_para.push_back(Dont_Search_Angle_1Msg);
+	scan_para.push_back(Dont_Search_Angle_2Msg);
+	scan_para.push_back(Dont_Search_Angle_3Msg);
+	scan_para.push_back(Angle_range_1Msg);
+	scan_para.push_back(Angle_range_2_3Msg);
+	nh.setParam("scan_para",scan_para);
+///////////////////////////////////FPS////////////////////////////////////////////////
+	nh.setParam("FPS",fpsMsg);
+/////////////////////////////////////////////////////////////////////////////////////
 }
 InterfaceProc::~InterfaceProc()
 {
@@ -136,11 +144,14 @@ InterfaceProc::~InterfaceProc()
     delete ColorModels;
 	cv::destroyWindow(OPENCV_WINDOW);
 }
-
+/////////////////////////////////影像讀進來//////////////////////////////////////////
 void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 {
 	
-	StartTime = ros::Time::now().toNSec();
+    frame_counter++;
+    static long int StartTime = ros::Time::now().toNSec();
+    static double FrameRate = 0.0;
+
 	cv_bridge::CvImagePtr cv_ptr;
 	try {
 		cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
@@ -159,12 +170,25 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 
 	cv::waitKey(3);
 /////////////////////////FPS設定///////////////////////////////////////	
-	/*EndTime = ros::Time::now().toNSec();
-	fpsmsg = 1000000000/(EndTime - StartTime);
-    camera.msg = fpsmsg;
-	nh.setParam("FPS",fpsmsg);*/
+    if(frame_counter == 10){
+      EndTime = ros::Time::now().toNSec();
+	if(fpsMsg!=0){
+      dt = (EndTime - StartTime)/frame_counter;
+      StartTime = EndTime;
+      if( dt!=0 )
+      {
+              FrameRate = ( 1000000000.0 / dt ) * ALPHA + FrameRate * ( 1.0 - ALPHA );
+              //cout << "FPS: " << FrameRate << endl;
+      }
+	}
+      frame_counter = 0;
+   }
+		fpsMsg=FrameRate;
 
+	//camera.publish(camera.msg);
 //////////////////////////////////////////////////////////////////////
+
+
 }
 cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
 {
@@ -235,5 +259,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
          }
 		}
     }
+
+	system("rosparam dump ~/interface_ws/Parameter.yaml");
 	return oframe;
 }
