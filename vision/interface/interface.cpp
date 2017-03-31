@@ -79,9 +79,8 @@ InterfaceProc::InterfaceProc()
 	:it_(nh)
 {
 	ros::NodeHandle n("~");
-
 	image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
-    image_pub_threshold_ = it_.advertise("/camera/image", 1);
+    image_pub_threshold_ = it_.advertise("/camera/image", 1);//http://localhost:8080/stream?topic=/camera/image webfor /camera/image
 	s1 = nh.subscribe("/interface/parameterbutton", 1000, &InterfaceProc::ParameterButtonCall, this);
     s2 = nh.subscribe("interface/color", 1000, &InterfaceProc::colorcall,this);
     s3 = nh.subscribe("interface/center", 1000, &InterfaceProc::centercall,this);
@@ -138,9 +137,9 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
 	static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
     for (int i = 0; i < iframe.rows; i++) {
         for (int j = 0; j < iframe.cols; j++) {
-            double B = iframe.data[(i*iframe.cols*3)+(j*3)+0]+0;
-            double G = iframe.data[(i*iframe.cols*3)+(j*3)+1]+0;
-            double R = iframe.data[(i*iframe.cols*3)+(j*3)+2]+0;
+            double B = iframe.data[(i*iframe.cols*3)+(j*3)+0];
+            double G = iframe.data[(i*iframe.cols*3)+(j*3)+1];
+            double R = iframe.data[(i*iframe.cols*3)+(j*3)+2];
             double H,S,V;
             V =(max(R,G)>max(G,B))?max(R,G):max(G,B);   //max(R,G,B);
             double mn=(min(R,G)<min(G,B))?min(R,G):min(G,B);//min(R,G,B);
@@ -180,7 +179,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                 smax = YellowHSVBoxMsg[3];
                 smin = YellowHSVBoxMsg[2];
                 vmax = YellowHSVBoxMsg[5];
-                vmin= YellowHSVBoxMsg[3];
+                vmin= YellowHSVBoxMsg[4];
                 break;
             case 4:
                 hmax = WhiteHSVBoxMsg[1];
@@ -205,11 +204,14 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
 	return oframe;
 }
 cv::Mat InterfaceProc::CenterModel(const cv::Mat iframe){
-
+   int lengh=30,x,y;
    static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
  oframe=iframe;
-   circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)), 10, Scalar(0,255,0), 1);
-
+   circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)), 1, Scalar(0,255,0), 1);
+   circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)),InnerMsg , Scalar(0,0,255), 1);
+   circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)),OuterMsg , Scalar(0,255,0), 1);
+   x=iframe.cols*(CenterXMsg*0.0014388)+lengh*cos(FrontMsg*PI/180),    y=iframe.rows*(CenterYMsg*0.002028)+lengh*sin(FrontMsg*PI/180);
+   line(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)), Point(x,y), Scalar(255,0,255), 1);
 return oframe;
 
 }
