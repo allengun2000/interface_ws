@@ -6,8 +6,9 @@
 #define IMAGE_TEST1 "/home/allen/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
-
-
+void onMouse(int Event,int x,int y,int flags,void* param);
+int mousex=-1;
+int mousey=-1,onchick=0;
 void InterfaceProc::ParameterButtonCall (const vision::parameterbutton msg)
 {
     buttonmsg=msg.button;
@@ -93,6 +94,7 @@ InterfaceProc::InterfaceProc()
     frame=new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
     ColorModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
     CenterModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
+    outputframe= new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
 } 
 
 InterfaceProc::~InterfaceProc()
@@ -118,18 +120,20 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
      case 2:
        *CenterModels=CenterModel(*frame);
         cv::imshow(OPENCV_WINDOW, *CenterModels);
+        outputframe=CenterModels;
     break;
      case 4:
         *ColorModels =ColorModel(*frame);
           cv::imshow(OPENCV_WINDOW, *ColorModels);
+          outputframe=ColorModels;
     break;
   }
-
-
-
-    sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", *CenterModels).toImageMsg();
+ setMouseCallback(OPENCV_WINDOW, onMouse,NULL);
+ if(onchick==1){
+   Omni_distance(mousex-CenterXMsg,mousey-CenterYMsg);onchick=0;
+  }
+ sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", *outputframe).toImageMsg();
     image_pub_threshold_.publish(thresholdMsg);
-
   cv::waitKey(3);
 }
 cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
@@ -148,6 +152,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
             if(B==V){H=240+(R-G)*60/(V-mn);}
             if(H<0){H=H+360;}
             S=(((V-mn)*100)/V);
+ //  usleep(300);
             switch(ColorModeMsg){
             case 0:
                  hmax = BallHSVBoxMsg[1];
@@ -190,7 +195,8 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                 vmin= WhiteHSVBoxMsg[4];
                 break;
             }
-
+            vmin=vmin*2.55;
+            vmax=vmax*2.55;
          if((H<=hmax)&&(S<=smax)&&(V<=vmax)&&(H>=hmin)&&(S>=smin )&&(V>=vmin) ){
             oframe.data[(i*iframe.cols*3)+(j*3)+0] = 0;
             oframe.data[(i*iframe.cols*3)+(j*3)+1] = 0;
@@ -207,6 +213,8 @@ cv::Mat InterfaceProc::CenterModel(const cv::Mat iframe){
    int lengh=30,x,y;
    static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
  oframe=iframe;
+
+ if(0<CenterXMsg<600){}else{CenterXMsg=0;CenterYMsg=0;InnerMsg=0;OuterMsg=0;FrontMsg=0;}//avoid code dump
    circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)), 1, Scalar(0,255,0), 1);
    circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)),InnerMsg , Scalar(0,0,255), 1);
    circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)),OuterMsg , Scalar(0,255,0), 1);
@@ -214,4 +222,40 @@ cv::Mat InterfaceProc::CenterModel(const cv::Mat iframe){
    line(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)), Point(x,y), Scalar(255,0,255), 1);
 return oframe;
 
+}
+double InterfaceProc::camera_f(int Omni_pixel){
+  double m = (Omni_pixel*0.0099)/60;        // m = H1/H0 = D1/D0    D0 + D1 = 180
+  double D0 = 180/(1+m);                    // D1 = m   *D0
+  double D1 = 180/(1+1/m);                  // D0 = 1/m *D1
+
+  double f = 1/(1/D0 + 1/D1);
+
+  //ROS_INFO("m = %f D0 = %f D1 = %f F = %f",m,D0,D1,f);
+  return D1;
+}
+
+double InterfaceProc::Omni_distance(int object_x , int object_y){
+  double Z = -1*Camera_HighMsg;
+  double c = 83.125;
+  double b = c*0.8722;
+
+ camera_focal=camera_f(OuterMsg*2);
+
+  double dis;
+
+  double pixel_dis = sqrt(pow(object_x,2)+pow(object_y,2));
+
+  double r = atan2(camera_focal,pixel_dis*0.0099);
+
+  dis = Z*(pow(b,2)-pow(c,2))*cos(r) / ((pow(b,2)+pow(c,2))*sin(r) - 2*b*c);
+  //dis/=10;
+  ROS_INFO("b = %f c = %f r=%f dis=%f",b,c,r,dis);
+  return dis;
+}
+void onMouse(int Event,int x,int y,int flags,void* param){
+    if(Event==CV_EVENT_LBUTTONDOWN){
+           mousex=x;
+           mousey=y;
+            onchick=1;
+    }
 }

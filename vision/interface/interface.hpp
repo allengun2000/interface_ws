@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <unistd.h>
 #include <opencv2/opencv.hpp>
 #include <math.h>
 #include <ros/ros.h>
@@ -40,6 +41,7 @@ private:
 	cv::Mat *frame;
     cv::Mat *ColorModels;
     cv::Mat *CenterModels;
+    cv::Mat *outputframe;
  int hmax,hmin,smax,smin,vmax,vmin;
 public:
   InterfaceProc();
@@ -50,6 +52,7 @@ public:
     int InnerMsg;
     int OuterMsg;
     int FrontMsg;
+    int camera_focal;
     int Camera_HighMsg;
     int colorbottonMsg;
     int Angle_Near_GapMsg;
@@ -83,6 +86,9 @@ public:
     void blackcall(const vision::black);
     void colorbuttoncall(const vision::colorbutton);
     void scancall(const vision::scan);
+    double camera_f(int Omni_pixel);
+    double Omni_distance(int object_x , int object_y);
+
     cv::Mat ColorModel(const cv::Mat iframe);
     cv::Mat CenterModel(const cv::Mat iframe);
 };
