@@ -1,3 +1,7 @@
+#include <cstdio>
+#include <unistd.h>
+#include <opencv2/opencv.hpp>
+#include <math.h>
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
@@ -17,6 +21,7 @@
 #include "vision/color.h"
 #include <stdio.h>
 #include <stdlib.h>
+using namespace cv;
 class InterfaceProc
 {
 private:
@@ -40,6 +45,8 @@ private:
 
 	cv::Mat *frame;
     cv::Mat *ColorModels;
+    cv::Mat *CenterModels;
+    cv::Mat *outputframe;
  int hmax,hmin,smax,smin,vmax,vmin;
 public:
   InterfaceProc();
@@ -47,9 +54,12 @@ public:
     int buttonmsg;
     int CenterXMsg;
     int CenterYMsg;
+    int robotCenterX;
+    int robotCenterY;
     int InnerMsg;
     int OuterMsg;
     int FrontMsg;
+    int camera_focal;
     int Camera_HighMsg;
     int colorbottonMsg;
     int Angle_Near_GapMsg;
@@ -84,6 +94,7 @@ public:
     void blackcall(const vision::black);
     void colorbuttoncall(const vision::colorbutton);
     void scancall(const vision::scan);
+<<<<<<< HEAD
 	void Parameter_setting(const int x) ;
     cv::Mat ColorModel(const cv::Mat iframe);
 
@@ -104,4 +115,11 @@ public:
     std::vector<int> HSV_green;
     std::vector<int> HSV_blue;
     std::vector<int> HSV_yellow;
+=======
+    double camera_f(int Omni_pixel);
+    double Omni_distance(int object_x , int object_y);
+
+    cv::Mat ColorModel(const cv::Mat iframe);
+    cv::Mat CenterModel(const cv::Mat iframe);
+>>>>>>> f6d93aad183471e2acc29d954273f45a586d4270
 };
