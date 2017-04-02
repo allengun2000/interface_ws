@@ -49,6 +49,8 @@ public:
     int buttonmsg;
     int CenterXMsg;
     int CenterYMsg;
+    int robotCenterX;
+    int robotCenterY;
     int InnerMsg;
     int OuterMsg;
     int FrontMsg;

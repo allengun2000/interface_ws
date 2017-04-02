@@ -130,7 +130,7 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
   }
  setMouseCallback(OPENCV_WINDOW, onMouse,NULL);
  if(onchick==1){
-   Omni_distance(mousex-CenterXMsg,mousey-CenterYMsg);onchick=0;
+   Omni_distance(mousex-robotCenterX,mousey-robotCenterY);onchick=0;
   }
  sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", *outputframe).toImageMsg();
     image_pub_threshold_.publish(thresholdMsg);
@@ -212,14 +212,14 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
 cv::Mat InterfaceProc::CenterModel(const cv::Mat iframe){
    int lengh=30,x,y;
    static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
- oframe=iframe;
-
+   oframe=iframe;
  if(0<CenterXMsg<600){}else{CenterXMsg=0;CenterYMsg=0;InnerMsg=0;OuterMsg=0;FrontMsg=0;}//avoid code dump
-   circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)), 1, Scalar(0,255,0), 1);
-   circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)),InnerMsg , Scalar(0,0,255), 1);
-   circle(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)),OuterMsg , Scalar(0,255,0), 1);
-   x=iframe.cols*(CenterXMsg*0.0014388)+lengh*cos(FrontMsg*PI/180),    y=iframe.rows*(CenterYMsg*0.002028)+lengh*sin(FrontMsg*PI/180);
-   line(oframe, Point(iframe.cols*(CenterXMsg*0.0014388),iframe.rows*(CenterYMsg*0.002028)), Point(x,y), Scalar(255,0,255), 1);
+ robotCenterX=iframe.cols*(CenterXMsg*0.0014388);robotCenterY=iframe.rows*(CenterYMsg*0.002028);
+   circle(oframe, Point(robotCenterX,robotCenterY), 1, Scalar(0,255,0), 1);
+   circle(oframe, Point(robotCenterX,robotCenterY),InnerMsg , Scalar(0,0,255), 1);
+   circle(oframe, Point(robotCenterX,robotCenterY),OuterMsg , Scalar(0,255,0), 1);
+   x=robotCenterX+lengh*cos(FrontMsg*PI/180),    y=robotCenterY+lengh*sin(FrontMsg*PI/180);
+   line(oframe, Point(robotCenterX,robotCenterY), Point(x,y), Scalar(255,0,255), 1);
 return oframe;
 
 }
