@@ -94,10 +94,7 @@ public:
     void blackcall(const vision::black);
     void colorbuttoncall(const vision::colorbutton);
     void scancall(const vision::scan);
-<<<<<<< HEAD
 	void Parameter_setting(const int x) ;
-    cv::Mat ColorModel(const cv::Mat iframe);
-
 	int mosue_x,mosue_y;
     int distance_space[100];
     int distance_pixel[100];
@@ -115,11 +112,11 @@ public:
     std::vector<int> HSV_green;
     std::vector<int> HSV_blue;
     std::vector<int> HSV_yellow;
-=======
+
     double camera_f(int Omni_pixel);
     double Omni_distance(int object_x , int object_y);
 
     cv::Mat ColorModel(const cv::Mat iframe);
     cv::Mat CenterModel(const cv::Mat iframe);
->>>>>>> f6d93aad183471e2acc29d954273f45a586d4270
+
 };
