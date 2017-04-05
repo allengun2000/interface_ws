@@ -7,7 +7,15 @@
 =======
 #define FRAME_COLS 640
 #define FRAME_ROWS 480
+<<<<<<< HEAD
 #define IMAGE_TEST1 "/home/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
+=======
+<<<<<<< HEAD
+#define IMAGE_TEST1 "/home/allen/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
+=======
+#define IMAGE_TEST1 "/home/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
+>>>>>>> fc49609e0eebdef009df4fa901e44b5286e82bf4
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
 >>>>>>> fc49609e0eebdef009df4fa901e44b5286e82bf4
@@ -67,7 +75,14 @@ void InterfaceProc::blackcall(const vision::black msg){
 void InterfaceProc::colorbuttoncall(const vision::colorbutton msg){
 	colorbottonMsg=msg.button;
 }
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> fc49609e0eebdef009df4fa901e44b5286e82bf4
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 void InterfaceProc::scancall(const vision::scan msg){
 	Angle_Near_GapMsg=msg.Angle_Near_Gap;
 	Magn_Near_GapMsg=msg.Magn_Near_Gap;
@@ -85,12 +100,19 @@ InterfaceProc::InterfaceProc()
     :it_(nh)
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     ros::NodeHandle n("~");
     image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
     image_pub_threshold_ = it_.advertise("/camera/image", 1);//http://localhost:8080/stream?topic=/camera/image webfor /camera/image
     s1 = nh.subscribe("/interface/parameterbutton", 1000, &InterfaceProc::ParameterButtonCall, this);
 =======
 	ros::NodeHandle nh("~");
+=======
+	ros::NodeHandle n("~");
+=======
+	ros::NodeHandle nh("~");
+>>>>>>> fc49609e0eebdef009df4fa901e44b5286e82bf4
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 
 	image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
 	image_pub_threshold_ = it_.advertise("/interface/image_raw/threshold", 1);
@@ -115,6 +137,12 @@ InterfaceProc::~InterfaceProc(){
     delete frame;
 =======
 } 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 void InterfaceProc::Parameter_setting(const int x){
 ////////////////////////////////HSV設定///////////////////////////////////////////
 	HSV_init[0] = 0; HSV_init[1] = 360;
@@ -150,6 +178,10 @@ void InterfaceProc::Parameter_setting(const int x){
 ///////////////////////////////////////////////////////////////////////////////////////
 
 }
+<<<<<<< HEAD
+=======
+>>>>>>> fc49609e0eebdef009df4fa901e44b5286e82bf4
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 InterfaceProc::~InterfaceProc()
 {
 	delete frame;
@@ -190,8 +222,16 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg){
 =======
 void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 {
+<<<<<<< HEAD
 	
 	StartTime = ros::Time::now().toNSec();
+=======
+<<<<<<< HEAD
+=======
+	
+	StartTime = ros::Time::now().toNSec();
+>>>>>>> fc49609e0eebdef009df4fa901e44b5286e82bf4
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 	cv_bridge::CvImagePtr cv_ptr;
 	try {
 		cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
@@ -208,6 +248,12 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 //	sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "mono16", *thresholdImg16).toImageMsg();
 //	image_pub_threshold_.publish(thresholdMsg);
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+  cv::waitKey(3);
+=======
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 	cv::waitKey(3);
 /////////////////////////FPS設定///////////////////////////////////////	
 	EndTime = ros::Time::now().toNSec();

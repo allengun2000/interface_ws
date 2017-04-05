@@ -50,6 +50,11 @@ private:
     ros::Subscriber s7;
     ros::Subscriber s8;
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 	int StartTime,EndTime;
 <<<<<<< HEAD
 	int core_num;
@@ -144,6 +149,10 @@ public:
     int fps_num[100];
     int fps_avg;
 
+<<<<<<< HEAD
+=======
+>>>>>>> fc49609e0eebdef009df4fa901e44b5286e82bf4
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 	cv::Mat *frame;
     cv::Mat *ColorModels;
  int hmax,hmin,smax,smin,vmax,vmin;
@@ -180,7 +189,14 @@ public:
     int YellowHSVBoxMsg[6];
     int WhiteHSVBoxMsg[6];
     int ColorModeMsg;
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> fc49609e0eebdef009df4fa901e44b5286e82bf4
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 	void imageCb(const sensor_msgs::ImageConstPtr&);
 	void ParameterButtonCall(const vision::parameterbutton);
     void colorcall(const vision::color);
@@ -190,6 +206,12 @@ public:
     void blackcall(const vision::black);
     void colorbuttoncall(const vision::colorbutton);
     void scancall(const vision::scan);
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    cv::Mat ColorModel(const cv::Mat iframe);
+=======
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 	void Parameter_setting(const int x) ;
     cv::Mat ColorModel(const cv::Mat iframe);
 

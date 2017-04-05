@@ -1,8 +1,16 @@
 #define PI 3.14159265
 #include "interface.hpp"
 #include "math.h"
+<<<<<<< HEAD
 #define FRAME_COLS 640 //width x695
 #define FRAME_ROWS 480 //height y493
+=======
+#define FRAME_COLS 640
+#define FRAME_ROWS 480
+#define IMAGE_TEST1 "/home/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
+static const std::string OPENCV_WINDOW = "Image window";
+using namespace std;
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 
 #define IMAGE_TEST1 "/home/testa/1.bmp"//圖片路徑
 
@@ -89,12 +97,55 @@ InterfaceProc::InterfaceProc()
     cv::namedWindow(OPENCV_WINDOW, CV_WINDOW_AUTOSIZE);
     frame=new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
     ColorModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
+<<<<<<< HEAD
     CenterModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
     outputframe= new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
 }
 
 InterfaceProc::~InterfaceProc(){
     delete frame;
+=======
+} 
+/*
+void InterfaceProc::Parameter_setting(const int x){
+////////////////////////////////HSV設定///////////////////////////////////////////
+	HSV_init[0] = 0; HSV_init[1] = 360;
+  HSV_init[2] = 0; HSV_init[3] = 255;
+  HSV_init[4] = 0; HSV_init[5] = 255;
+
+	nh.setParam("Colormode",ColorModeMsg);
+	if(nh.hasParam("Colormode")){
+		for(int i=0;i<6;i++){
+
+			HSV_red.push_back(BallHSVBoxMsg[i]);  HSV_green.push_back(BlueHSVBoxMsg[i]);
+            HSV_blue.push_back(GreenHSVBoxMsg[i]); HSV_yellow.push_back(YellowHSVBoxMsg[i]);
+			}
+			nh.setParam("/HSV/Ball",HSV_red);
+			nh.setParam("/HSV/Blue",HSV_blue);
+			nh.setParam("/HSV/Yellow",HSV_yellow);
+			nh.setParam("/HSV/Green",HSV_green);
+			
+	//	}
+/////////////////////////////////掃瞄點前置參數///////////////////////////////////
+	scan_para[0].push_back(Angle_Near_GapMsg);
+	scan_para[1].push_back(Magn_Near_GapMsg);
+	scan_para[2].push_back(Magn_Near_StartMsg);
+	scan_para[3].push_back(Magn_Middle_StartMsg);
+	scan_para[4].push_back(Magn_Far_StartMsg);
+	scan_para[5].push_back(Magn_Far_EndMsg);
+	scan_para[6].push_back(Dont_Search_Angle_1Msg);
+	scan_para[7].push_back(Dont_Search_Angle_2Msg);
+	scan_para[8].push_back(Dont_Search_Angle_3Msg);
+	scan_para[9].push_back(Angle_range_1Msg);
+	scan_para[10].push_back(Angle_range_2_3Msg);
+	nh.setParam("scan_para",scan_para);
+///////////////////////////////////////////////////////////////////////////////////////
+}
+*/
+InterfaceProc::~InterfaceProc()
+{
+	delete frame;
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
     delete ColorModels;
     delete CenterModels;
     cv::destroyWindow(OPENCV_WINDOW);
@@ -127,6 +178,11 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg){
 	sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", *outputframe).toImageMsg();
     image_pub_threshold_.publish(thresholdMsg);
 	cv::waitKey(3);
+<<<<<<< HEAD
+=======
+
+//////////////////////////////////////////////////////////////////////
+>>>>>>> 1837c98fd30ba4f770ab8259df67e7126ff31308
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
