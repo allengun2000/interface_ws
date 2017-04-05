@@ -148,9 +148,6 @@ InterfaceProc::~InterfaceProc()
 void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 {
 	
-    frame_counter++;
-    static long int StartTime = ros::Time::now().toNSec();
-    static double FrameRate = 0.0;
 
 	cv_bridge::CvImagePtr cv_ptr;
 	try {
@@ -170,6 +167,9 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 
 	cv::waitKey(3);
 /////////////////////////FPS設定///////////////////////////////////////	
+	frame_counter++;
+    static long int StartTime = ros::Time::now().toNSec();
+    static double FrameRate = 0.0;
     if(frame_counter == 10){
       EndTime = ros::Time::now().toNSec();
 	if(fpsMsg!=0){
@@ -258,8 +258,9 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
              oframe.data[(i*iframe.cols*3)+(j*3)+2]=iframe.data[(i*iframe.cols*3)+(j*3)+2] ;
          }
 		}
+
     }
 
-	system("rosparam dump ~/interface_ws/Parameter.yaml");
+	system("rosparam dump ~Home/interface_ws/Parameter.yaml");
 	return oframe;
 }
