@@ -3,6 +3,7 @@
 #include "math.h"
 #define FRAME_COLS 640
 #define FRAME_ROWS 480
+#define IMAGE_TEST1 "/home/interface_ws/src/interface_ws/vision/1.jpg"//圖片路徑
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
 
@@ -61,6 +62,7 @@ void InterfaceProc::blackcall(const vision::black msg){
 void InterfaceProc::colorbuttoncall(const vision::colorbutton msg){
  colorbottonMsg=msg.button;
 }
+
 void InterfaceProc::scancall(const vision::scan msg){
 Angle_Near_GapMsg=msg.Angle_Near_Gap;
 Magn_Near_GapMsg=msg.Magn_Near_Gap;
@@ -77,7 +79,7 @@ Angle_range_2_3Msg=msg.Angle_range_2_3;
 InterfaceProc::InterfaceProc()
 	:it_(nh)
 {
-	ros::NodeHandle n("~");
+	ros::NodeHandle nh("~");
 
 	image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
 	image_pub_threshold_ = it_.advertise("/interface/image_raw/threshold", 1);
@@ -93,7 +95,42 @@ InterfaceProc::InterfaceProc()
     frame=new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
     ColorModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
 } 
+/*
+void InterfaceProc::Parameter_setting(const int x){
+////////////////////////////////HSV設定///////////////////////////////////////////
+	HSV_init[0] = 0; HSV_init[1] = 360;
+  HSV_init[2] = 0; HSV_init[3] = 255;
+  HSV_init[4] = 0; HSV_init[5] = 255;
 
+	nh.setParam("Colormode",ColorModeMsg);
+	if(nh.hasParam("Colormode")){
+		for(int i=0;i<6;i++){
+
+			HSV_red.push_back(BallHSVBoxMsg[i]);  HSV_green.push_back(BlueHSVBoxMsg[i]);
+            HSV_blue.push_back(GreenHSVBoxMsg[i]); HSV_yellow.push_back(YellowHSVBoxMsg[i]);
+			}
+			nh.setParam("/HSV/Ball",HSV_red);
+			nh.setParam("/HSV/Blue",HSV_blue);
+			nh.setParam("/HSV/Yellow",HSV_yellow);
+			nh.setParam("/HSV/Green",HSV_green);
+			
+	//	}
+/////////////////////////////////掃瞄點前置參數///////////////////////////////////
+	scan_para[0].push_back(Angle_Near_GapMsg);
+	scan_para[1].push_back(Magn_Near_GapMsg);
+	scan_para[2].push_back(Magn_Near_StartMsg);
+	scan_para[3].push_back(Magn_Middle_StartMsg);
+	scan_para[4].push_back(Magn_Far_StartMsg);
+	scan_para[5].push_back(Magn_Far_EndMsg);
+	scan_para[6].push_back(Dont_Search_Angle_1Msg);
+	scan_para[7].push_back(Dont_Search_Angle_2Msg);
+	scan_para[8].push_back(Dont_Search_Angle_3Msg);
+	scan_para[9].push_back(Angle_range_1Msg);
+	scan_para[10].push_back(Angle_range_2_3Msg);
+	nh.setParam("scan_para",scan_para);
+///////////////////////////////////////////////////////////////////////////////////////
+}
+*/
 InterfaceProc::~InterfaceProc()
 {
 	delete frame;
@@ -103,6 +140,8 @@ InterfaceProc::~InterfaceProc()
 
 void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 {
+	
+	StartTime = ros::Time::now().toNSec();
 	cv_bridge::CvImagePtr cv_ptr;
 	try {
 		cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
@@ -119,7 +158,9 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 //	sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "mono16", *thresholdImg16).toImageMsg();
 //	image_pub_threshold_.publish(thresholdMsg);
 
-  cv::waitKey(3);
+	cv::waitKey(3);
+
+//////////////////////////////////////////////////////////////////////
 }
 cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
 {
@@ -144,7 +185,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                  smax = BallHSVBoxMsg[3];
                  smin = BallHSVBoxMsg[2];
                  vmax = BallHSVBoxMsg[5];
-                 vmin= BallHSVBoxMsg[4];
+                 vmin = BallHSVBoxMsg[4];
                 break;
             case 1:
                 hmax = GreenHSVBoxMsg[1];
@@ -152,7 +193,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                 smax = GreenHSVBoxMsg[3];
                 smin = GreenHSVBoxMsg[2];
                 vmax = GreenHSVBoxMsg[5];
-                vmin= GreenHSVBoxMsg[4];
+                vmin = GreenHSVBoxMsg[4];
                 break;
             case 2:
                 hmax = BlueHSVBoxMsg[1];
@@ -160,7 +201,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                 smax = BlueHSVBoxMsg[3];
                 smin = BlueHSVBoxMsg[2];
                 vmax = BlueHSVBoxMsg[5];
-                vmin= BlueHSVBoxMsg[4];
+                vmin = BlueHSVBoxMsg[4];
                 break;
             case 3:
                 hmax = YellowHSVBoxMsg[1];
@@ -168,15 +209,15 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                 smax = YellowHSVBoxMsg[3];
                 smin = YellowHSVBoxMsg[2];
                 vmax = YellowHSVBoxMsg[5];
-                vmin= YellowHSVBoxMsg[3];
+                vmin = YellowHSVBoxMsg[3];
                 break;
             case 4:
                 hmax = WhiteHSVBoxMsg[1];
                 hmin = WhiteHSVBoxMsg[0];
                 smax = WhiteHSVBoxMsg[3];
-                smin =WhiteHSVBoxMsg[2];
+                smin = WhiteHSVBoxMsg[2];
                 vmax = WhiteHSVBoxMsg[5];
-                vmin= WhiteHSVBoxMsg[4];
+                vmin = WhiteHSVBoxMsg[4];
                 break;
             }
 

@@ -33,6 +33,11 @@ private:
     ros::Subscriber s7;
     ros::Subscriber s8;
 
+	int StartTime,EndTime;
+    int core_num;
+    int fps_num[100];
+    int fps_avg;
+
 	cv::Mat *frame;
     cv::Mat *ColorModels;
 	cv::Mat *centermats;
@@ -70,6 +75,7 @@ public:
     int YellowHSVBoxMsg[6];
     int WhiteHSVBoxMsg[6];
     int ColorModeMsg;
+
 	void imageCb(const sensor_msgs::ImageConstPtr&);
 	void ParameterButtonCall(const vision::parameterbutton);
     void colorcall(const vision::color);
@@ -79,5 +85,24 @@ public:
     void blackcall(const vision::black);
     void colorbuttoncall(const vision::colorbutton);
     void scancall(const vision::scan);
+	void Parameter_setting(const int x) ;
     cv::Mat ColorModel(const cv::Mat iframe);
+
+	int mosue_x,mosue_y;
+    int distance_space[100];
+    int distance_pixel[100];
+    int HSV_init[6];
+
+    std::vector<int>scan_para;
+    std::vector<int>scan_near;
+    std::vector<int>scan_middle;
+    std::vector<int>scan_far;
+
+    std::vector<int>dis_space;
+    std::vector<int>dis_pixel;
+
+    std::vector<int> HSV_red;
+    std::vector<int> HSV_green;
+    std::vector<int> HSV_blue;
+    std::vector<int> HSV_yellow;
 };
