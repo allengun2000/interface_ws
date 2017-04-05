@@ -3,8 +3,8 @@
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "interface_node");
-  InterfaceProc ip;
-  ros::spin();
+  ros::init(argc, argv, "interface_node");//initial
+  InterfaceProc ip;//class:InterfaceProc(interface.hpp)
+  ros::spin();//listen topic value
   return 0;
 }
