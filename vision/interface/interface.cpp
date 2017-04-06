@@ -5,11 +5,9 @@
 #define FRAME_ROWS 480//height y493
 #define IMAGE_TEST1 "src/interface_ws/vision/1.jpg"//圖片路徑
 static const std::string OPENCV_WINDOW = "Image window";
-
 using namespace std;
 
 const double ALPHA = 0.5;
-
 
 void onMouse(int Event,int x,int y,int flags,void* param);
 	int mousex=-1;
@@ -44,30 +42,29 @@ void InterfaceProc::colorcall(const vision::color msg){
          WhiteHSVBoxMsg[i]=msg.WhiteHSVBox[i];
          break;
      }
-    //std::cout<<BallHSVBoxMsg[3]<<std::endl;
 
 }
 void InterfaceProc::centercall(const vision::center msg){
-        CenterXMsg=msg.CenterX;
-        CenterYMsg=msg.CenterY;
-        InnerMsg=msg.Inner;
-        OuterMsg=msg.Outer;
-        FrontMsg=msg.Front;
-        Camera_HighMsg=msg.Camera_High;
+    CenterXMsg=msg.CenterX;
+    CenterYMsg=msg.CenterY;
+    InnerMsg=msg.Inner;
+    OuterMsg=msg.Outer;
+    FrontMsg=msg.Front;
+    Camera_HighMsg=msg.Camera_High;
 }
 void InterfaceProc::whitecall(const vision::white msg){
     WhiteGrayMsg=msg.Gray;
     WhiteAngleMsg=msg.Angle;
 }
 void InterfaceProc::cameracall(const vision::camera msg){
-	fpsMsg=msg.fps;
+  fpsMsg=msg.fps;
 }
 void InterfaceProc::blackcall(const vision::black msg){
     BlackGrayMsg=msg.Gray;
     BlackAngleMsg=msg.Angle;
 }
 void InterfaceProc::colorbuttoncall(const vision::colorbutton msg){
-	colorbottonMsg=msg.button;
+    colorbottonMsg=msg.button;
 }
 void InterfaceProc::scancall(const vision::scan msg){
 	Angle_Near_GapMsg=msg.Angle_Near_Gap;
@@ -82,11 +79,90 @@ void InterfaceProc::scancall(const vision::scan msg){
 	Angle_range_1Msg=msg.Angle_range_1;
 	Angle_range_2_3Msg=msg.Angle_range_2_3;
 }
-InterfaceProc::InterfaceProc()
-    :it_(nh)
+void InterfaceProc::Parameter_getting(const int x){
+ 
 
+
+   if(ifstream("Parameter.yaml")){
+    system("rosparam load Parameter.yaml");
+    cout<<"read the YAML file"<<endl;
+    }
+   else{
+    HSV_init[0] = 0; HSV_init[1] = 360;
+    HSV_init[2] = 0; HSV_init[3] = 255;
+    HSV_init[4] = 0; HSV_init[5] = 255;
+
+	 for(int i=0;i<6;i++){
+
+		HSV_red.push_back(HSV_init[i]);  HSV_green.push_back(HSV_init[i]);
+    HSV_blue.push_back(HSV_init[i]); HSV_yellow.push_back(HSV_init[i]);
+		}
+    nh.setParam("/FIRA/HSV/Ball",HSV_red);
+	  nh.setParam("/FIRA/HSV/Blue",HSV_blue);
+	  nh.setParam("/FIRA/HSV/Yellow",HSV_yellow);
+	  nh.setParam("/FIRA/HSV/Green",HSV_green);
+    nh.setParam("/FIRA/HSV/white/gray",0);
+    nh.setParam("/FIRA/HSV/white/angle",0);
+    nh.setParam("/FIRA/HSV/black/gray",0);
+    nh.setParam("/FIRA/HSV/black/angle",0);
+/////////////////////////////////掃瞄點前置參數///////////////////////////////////
+    scan_para.clear();
+	  scan_para.push_back(0);
+	  scan_para.push_back(0);
+	  scan_para.push_back(0);
+	  scan_para.push_back(0);
+	  scan_para.push_back(0);
+	  scan_para.push_back(0);
+	  scan_para.push_back(0);
+	  scan_para.push_back(0);
+	  scan_para.push_back(0);
+	  scan_para.push_back(0);
+	  scan_para.push_back(0);
+	  nh.setParam("/FIRA/scan_para",scan_para);
+
+///////////////////////////////////FPS設定////////////////////////////////////////////////
+	  nh.setParam("/FIRA/FPS",0);
+//////////////////////////////////CNETER設定///////////////////////////////////////////////
+	  nh.setParam("/FIRA/Center/Center_X",0);
+    nh.setParam("/FIRA/Center/Center_Y",0);
+    nh.setParam("/FIRA/Center/Inner",0);
+    nh.setParam("/FIRA/Center/Outer",0);
+    nh.setParam("/FIRA/Center/Front",0);
+    nh.setParam("/FIRA/Center/Camera_high",0);
+
+    system("rosparam dump Parameter.yaml");
+    system("rosparam dump default.yaml");
+    cout<<"Parameter is created "<<endl;
+   }
+  
+
+}
+
+void InterfaceProc::Parameter_setting(const vision::parametercheck msg){
+
+    paraMeterCheck=msg.checkpoint;
+    /*system("rosparam delete /FIRA");
+    system("rosparam dump Parameter.yaml");
+    remove("Parameter.yaml");*/
+
+////////////////////////////////////如果有新的topic進來////////////////////////////
+    if(paraMeterCheck!=0){
+
+	    system("rosparam dump Parameter.yaml");
+      paraMeterCheck=0;
+    }
+  
+    
+    cout<<"Parameter has change "<<endl;
+
+}
+
+
+InterfaceProc::InterfaceProc()
+    :it_(nh) 
 {
     ros::NodeHandle n("~");
+    Parameter_getting(1);
     image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
     image_pub_threshold_ = it_.advertise("/camera/image", 1);//http://localhost:8080/stream?topic=/camera/image webfor /camera/image
     s1 = nh.subscribe("interface/parameterbutton", 1000, &InterfaceProc::ParameterButtonCall, this);
@@ -97,8 +173,7 @@ InterfaceProc::InterfaceProc()
     s6 = nh.subscribe("interface/black", 1000, &InterfaceProc::blackcall,this);
     s7 = nh.subscribe("interface/colorbutton", 1000, &InterfaceProc::colorbuttoncall,this);
     s8 = nh.subscribe("interface/scan", 1000, &InterfaceProc::scancall,this);
-	//s9 = nh.subscribe( ,1000, &InterfaceProc::Parameter_setting,this);
-	Parameter_setting(1);
+	  s9 = nh.subscribe("interface/parametercheck",1000, &InterfaceProc::Parameter_setting,this);
     cv::namedWindow(OPENCV_WINDOW, CV_WINDOW_AUTOSIZE);
 	//cv::Mat iframe;
     frame=new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
@@ -108,84 +183,6 @@ InterfaceProc::InterfaceProc()
 
 	//imshow("TEST",outputframe);
 } 
-
-
-void InterfaceProc::Parameter_getting(const int x){
-	nh.getParam("/FIRA/HSV/Ball",HSV_red);
-	nh.getParam("/FIRA/HSV/Blue",HSV_blue);
-	nh.getParam("/FIRA/HSV/Yellow",HSV_yellow);
-	nh.getParam("/FIRA/HSV/Green",HSV_green);
-///////////////////////////////////////////////////////////
-	nh.getParam("/FIRA/scan_para",scan_para);
-//////////////////////////////////////////////////////////
-	nh.getParam("/FIRA/FPS",fpsMsg);
-/////////////////////////////////////////////////////////////////////////////////
-	nh.getParam("/FIRA/Center/Center_X",CenterXMsg);
-    nh.getParam("/FIRA/Center/Center_Y",CenterYMsg);
-    nh.getParam("/FIRA/Center/Inner",InnerMsg);
-    nh.getParam("/FIRA/Center/Outer",OuterMsg);
-    nh.getParam("/FIRA/Center/Front",FrontMsg);
-    nh.getParam("/FIRA/Center/Camera_high",Camera_HighMsg);
-}
-
-void InterfaceProc::Parameter_setting(const int x){
-
-////////////////////////////////HSV設定///////////////////////////////////////////
-	HSV_init[0] = 0; HSV_init[1] = 360;
-    HSV_init[2] = 0; HSV_init[3] = 255;
-    HSV_init[4] = 0; HSV_init[5] = 255;
-	int y;
-	nh.setParam("Colormode",ColorModeMsg);
-	if(nh.hasParam("Colormode")){
-		for(int i=0;i<6;i++){
-
-			HSV_red.push_back(BallHSVBoxMsg[i]);  HSV_green.push_back(BlueHSVBoxMsg[i]);
-            HSV_blue.push_back(GreenHSVBoxMsg[i]); HSV_yellow.push_back(YellowHSVBoxMsg[i]);
-			}
-		}
-		else{
-			for(int i=0;i<6;i++){
-
-			HSV_red.push_back(HSV_init[i]);  HSV_green.push_back(HSV_init[i]);
-      	  	HSV_blue.push_back(HSV_init[i]); HSV_yellow.push_back(HSV_init[i]);
-			}
-		}
-	nh.setParam("/FIRA/HSV/Ball",HSV_red);
-	nh.setParam("/FIRA/HSV/Blue",HSV_blue);
-	nh.setParam("/FIRA/HSV/Yellow",HSV_yellow);
-	nh.setParam("/FIRA/HSV/Green",HSV_green);
-/////////////////////////////////掃瞄點前置參數///////////////////////////////////
-	scan_para.push_back(Angle_Near_GapMsg);
-	scan_para.push_back(Magn_Near_GapMsg);
-	scan_para.push_back(Magn_Near_StartMsg);
-	scan_para.push_back(Magn_Middle_StartMsg);
-	scan_para.push_back(Magn_Far_StartMsg);
-	scan_para.push_back(Magn_Far_EndMsg);
-	scan_para.push_back(Dont_Search_Angle_1Msg);
-	scan_para.push_back(Dont_Search_Angle_2Msg);
-	scan_para.push_back(Dont_Search_Angle_3Msg);
-	scan_para.push_back(Angle_range_1Msg);
-	scan_para.push_back(Angle_range_2_3Msg);
-	nh.setParam("/FIRA/scan_para",scan_para);
-///////////////////////////////////FPS設定////////////////////////////////////////////////
-	nh.setParam("/FIRA/FPS",fpsMsg);
-//////////////////////////////////CNETER設定///////////////////////////////////////////////
-	nh.setParam("/FIRA/Center/Center_X",CenterXMsg);
-    nh.setParam("/FIRA/Center/Center_Y",CenterYMsg);
-    nh.setParam("/FIRA/Center/Inner",InnerMsg);
-    nh.setParam("/FIRA/Center/Outer",OuterMsg);
-    nh.setParam("/FIRA/Center/Front",FrontMsg);
-    nh.setParam("/FIRA/Center/Camera_high",Camera_HighMsg);
-///////////////////////////////////////////////////////////////////////////////////////
-	for(;;){
-	y=fpsMsg;
-	system("rosparam dump ~/interface_ws/Parameter.yaml");
-	}
-	
-	if(y!=fpsMsg) {cout<<fpsMsg<<endl;}
-}
-
-
 
 
 InterfaceProc::~InterfaceProc()
@@ -200,7 +197,6 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 {
 
 	
-	Parameter_getting(1);
 	cv_bridge::CvImagePtr cv_ptr;
 	try {
 		cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);

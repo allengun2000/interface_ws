@@ -68,7 +68,7 @@ function RobotConnect() {
 }
 
 
-/*
+
 //confirm_connect
 ros.on('connection', function() {
     console.log('Robot1 Connected to websocket server.');
@@ -88,4 +88,3 @@ ros.on('close', function() {
     context.fillStyle = "red";
     context.fill();
 });
-*/

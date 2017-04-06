@@ -40,7 +40,7 @@ function ParameterCenterTransfer(){
 //ParameterScan
 var ParameterScan = new ROSLIB.Param({
     ros: ros,
-    name: '/FIRA/scan_para',
+    name: '/FIRA/scan',
 });
 function ParameterScanTransfer(){
 	var box = [];
