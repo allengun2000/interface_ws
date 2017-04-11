@@ -47,13 +47,15 @@ private:
 
 
 	cv::Mat *frame;
-  cv::Mat *ColorModels;
 
  	
 
 
 
   cv::Mat *CenterModels;
+  cv::Mat *ColorModels;
+  cv::Mat *CameraModels;
+  cv::Mat *ScanModels;
   cv::Mat *outputframe;
  int hmax,hmin,smax,smin,vmax,vmin;
 
@@ -134,9 +136,11 @@ public:
 
   double camera_f(int Omni_pixel);
   double Omni_distance(int object_x , int object_y);
+  int Angle_Interval(int);
 
   cv::Mat ColorModel(const cv::Mat iframe);
   cv::Mat CenterModel(const cv::Mat iframe);
-
+  cv::Mat ScanModel(const cv::Mat iframe);
+  cv::Mat CameraModel(const cv::Mat iframe);
 
 };

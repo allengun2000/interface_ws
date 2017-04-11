@@ -81,61 +81,55 @@ void InterfaceProc::scancall(const vision::scan msg){
 }
 void InterfaceProc::Parameter_getting(const int x){
  
-
-
    if(ifstream("Parameter.yaml")){
-    system("rosparam load Parameter.yaml");
-    cout<<"read the YAML file"<<endl;
+      system("rosparam load Parameter.yaml");
+      cout<<"read the YAML file"<<endl;
     }
    else{
-    HSV_init[0] = 0; HSV_init[1] = 360;
-    HSV_init[2] = 0; HSV_init[3] = 255;
-    HSV_init[4] = 0; HSV_init[5] = 255;
+      HSV_init[0] = 0; HSV_init[1] = 360;
+      HSV_init[2] = 0; HSV_init[3] = 255;
+      HSV_init[4] = 0; HSV_init[5] = 255;
 
 	 for(int i=0;i<6;i++){
+		  HSV_red.push_back(HSV_init[i]);  HSV_green.push_back(HSV_init[i]);
+      HSV_blue.push_back(HSV_init[i]); HSV_yellow.push_back(HSV_init[i]);
+		  }
+      nh.setParam("/FIRA/HSV/Ball",HSV_red);
+	    nh.setParam("/FIRA/HSV/Blue",HSV_blue);
+	    nh.setParam("/FIRA/HSV/Yellow",HSV_yellow);
+	    nh.setParam("/FIRA/HSV/Green",HSV_green);
+      nh.setParam("/FIRA/HSV/white/gray",0);
+      nh.setParam("/FIRA/HSV/white/angle",0);
+      nh.setParam("/FIRA/HSV/black/gray",0);
+      nh.setParam("/FIRA/HSV/black/angle",0);
+  /////////////////////////////////掃瞄點前置參數///////////////////////////////////
+      scan_para.clear();
+	    scan_para.push_back(0);
+	    scan_para.push_back(0);
+	    scan_para.push_back(0);
+	    scan_para.push_back(0);
+	    scan_para.push_back(0);
+	    scan_para.push_back(0);
+	    scan_para.push_back(0);
+	    scan_para.push_back(0);
+	    scan_para.push_back(0);
+	    scan_para.push_back(0);
+	    scan_para.push_back(0);
+	    nh.setParam("/FIRA/scan_para",scan_para);
+  ///////////////////////////////////FPS設定////////////////////////////////////////////////
+	    nh.setParam("/FIRA/FPS",60);
+  //////////////////////////////////CNETER設定///////////////////////////////////////////////
+	    nh.setParam("/FIRA/Center/Center_X",350);
+      nh.setParam("/FIRA/Center/Center_Y",252);
+      nh.setParam("/FIRA/Center/Inner",65);
+      nh.setParam("/FIRA/Center/Outer",131);
+      nh.setParam("/FIRA/Center/Front",199);
+      nh.setParam("/FIRA/Center/Camera_high",1);
 
-		HSV_red.push_back(HSV_init[i]);  HSV_green.push_back(HSV_init[i]);
-    HSV_blue.push_back(HSV_init[i]); HSV_yellow.push_back(HSV_init[i]);
-		}
-    nh.setParam("/FIRA/HSV/Ball",HSV_red);
-	  nh.setParam("/FIRA/HSV/Blue",HSV_blue);
-	  nh.setParam("/FIRA/HSV/Yellow",HSV_yellow);
-	  nh.setParam("/FIRA/HSV/Green",HSV_green);
-    nh.setParam("/FIRA/HSV/white/gray",0);
-    nh.setParam("/FIRA/HSV/white/angle",0);
-    nh.setParam("/FIRA/HSV/black/gray",0);
-    nh.setParam("/FIRA/HSV/black/angle",0);
-/////////////////////////////////掃瞄點前置參數///////////////////////////////////
-    scan_para.clear();
-	  scan_para.push_back(0);
-	  scan_para.push_back(0);
-	  scan_para.push_back(0);
-	  scan_para.push_back(0);
-	  scan_para.push_back(0);
-	  scan_para.push_back(0);
-	  scan_para.push_back(0);
-	  scan_para.push_back(0);
-	  scan_para.push_back(0);
-	  scan_para.push_back(0);
-	  scan_para.push_back(0);
-	  nh.setParam("/FIRA/scan_para",scan_para);
-
-///////////////////////////////////FPS設定////////////////////////////////////////////////
-	  nh.setParam("/FIRA/FPS",0);
-//////////////////////////////////CNETER設定///////////////////////////////////////////////
-	  nh.setParam("/FIRA/Center/Center_X",0);
-    nh.setParam("/FIRA/Center/Center_Y",0);
-    nh.setParam("/FIRA/Center/Inner",0);
-    nh.setParam("/FIRA/Center/Outer",0);
-    nh.setParam("/FIRA/Center/Front",0);
-    nh.setParam("/FIRA/Center/Camera_high",0);
-
-    system("rosparam dump Parameter.yaml");
-    system("rosparam dump default.yaml");
-    cout<<"Parameter is created "<<endl;
+      system("rosparam dump Parameter.yaml");
+      system("rosparam dump default.yaml");
+      cout<<"Parameter is created "<<endl;
    }
-  
-
 }
 
 void InterfaceProc::Parameter_setting(const vision::parametercheck msg){
@@ -179,6 +173,8 @@ InterfaceProc::InterfaceProc()
     frame=new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
     ColorModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
     CenterModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
+    ScanModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
+    CameraModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
     outputframe= new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
 
 	//imshow("TEST",outputframe);
@@ -190,6 +186,8 @@ InterfaceProc::~InterfaceProc()
     delete frame;
     delete ColorModels;
     delete CenterModels;
+    delete ScanModels;
+    delete CameraModels;
     cv::destroyWindow(OPENCV_WINDOW);
 }
 /////////////////////////////////影像讀進來//////////////////////////////////////////
@@ -207,6 +205,9 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 
 	*frame = cv_ptr->image;
     *ColorModels =ColorModel(*frame);
+    *CenterModels =ColorModel(*frame);
+    *CameraModels =ColorModel(*frame);
+    *ScanModels =ColorModel(*frame);
 
 	// Image Output
     cv::imshow(OPENCV_WINDOW, *ColorModels);
@@ -237,15 +238,25 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 //////////////////////////////////////////////////////////////////////
 
    switch(buttonmsg){
+     case 1:
+        *CameraModels=CameraModel(*frame);
+         cv::imshow(OPENCV_WINDOW, *CameraModels);
+         outputframe=CameraModels;
+         break;
      case 2:
        *CenterModels=CenterModel(*frame);
         cv::imshow(OPENCV_WINDOW, *CenterModels);
         outputframe=CenterModels;
     break;
+     case 3:
+        *ScanModels=ScanModel(*frame);
+         cv::imshow(OPENCV_WINDOW, *ScanModels);
+         outputframe=ScanModels;
+         break;
      case 4:
         *ColorModels =ColorModel(*frame);
-          cv::imshow(OPENCV_WINDOW, *ColorModels);
-          outputframe=ColorModels;
+         cv::imshow(OPENCV_WINDOW, *ColorModels);
+         outputframe=ColorModels;
     break;
   }
  setMouseCallback(OPENCV_WINDOW, onMouse,NULL);
@@ -328,12 +339,34 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
          }
 
 
-	return oframe;
 
         }
     }
     return oframe;
 }
+cv::Mat InterfaceProc::CameraModel(const cv::Mat iframe){
+ /////////////////////////FPS設定///////////////////////////////////////	
+	frame_counter++;
+    static long int StartTime = ros::Time::now().toNSec();
+    static double FrameRate = 0.0;
+    if(frame_counter == 10){
+      EndTime = ros::Time::now().toNSec();
+	if(fpsMsg!=0){
+      dt = (EndTime - StartTime)/frame_counter;
+      StartTime = EndTime;
+      if( dt!=0 )
+      {
+              FrameRate = ( 1000000000.0 / dt ) * ALPHA + FrameRate * ( 1.0 - ALPHA );
+              cout << "FPS: " << FrameRate << endl;
+      }
+	}
+      frame_counter = 0;
+   }
+		fpsMsg=FrameRate;
+
+	//camera.publish(camera.msg);
+}
+///////////////////////////////Center參數///////////////////////////////////////
 cv::Mat InterfaceProc::CenterModel(const cv::Mat iframe){
    int lengh=30,x,y;
    static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
@@ -346,7 +379,7 @@ cv::Mat InterfaceProc::CenterModel(const cv::Mat iframe){
    x=robotCenterX+lengh*cos(FrontMsg*PI/180),    y=robotCenterY+lengh*sin(FrontMsg*PI/180);
    line(oframe, Point(robotCenterX,robotCenterY), Point(x,y), Scalar(255,0,255), 1);
 return oframe;
-
+  
 }
 double InterfaceProc::camera_f(int Omni_pixel){
   double m = (Omni_pixel*0.0099)/60;        // m = H1/H0 = D1/D0    D0 + D1 = 180
@@ -385,4 +418,64 @@ void onMouse(int Event,int x,int y,int flags,void* param){
     }
 
 }
+///////////////////////////////////掃描參數(Scan)//////////////////////////////////
+
+//掃描點座標調整
+//修正超出圖片的點座標
+int Frame_Area(int coordinate, int range){
+  if(coordinate < 0) coordinate = 0;
+  else if(coordinate >= range) coordinate = range -1;
+  return coordinate;
+}
+//角度調整
+//修正大於和小於360的角度
+int Angle_Adjustment(int angle){
+  if (angle < 0) return angle + 360;
+  else if (angle >= 360) return angle - 360;
+  else return angle;
+}
+//角度間隔
+//middle start 到 far start 之間　Angle near gap的值為1/2
+//far start 之外 Angle near gap的值為1/4
+int InterfaceProc::Angle_Interval(int radius){ 
+  if(radius <= Magn_Middle_StartMsg) return Angle_Near_GapMsg;
+  else if(radius > Magn_Middle_StartMsg && radius <= Magn_Far_StartMsg) return Angle_Near_GapMsg /2;
+  else return Angle_Near_GapMsg /4;
+}
+cv::Mat InterfaceProc::ScanModel(const cv::Mat iframe){
+  static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
+  oframe=iframe;
+
+  int Unscaned_Area[6]={0};
+  int x,y;
+
+  Unscaned_Area[0] = Angle_Adjustment(Dont_Search_Angle_1Msg - Angle_range_1Msg);
+  Unscaned_Area[1] = Angle_Adjustment(Dont_Search_Angle_1Msg + Angle_range_1Msg);
+  Unscaned_Area[2] = Angle_Adjustment(Dont_Search_Angle_2Msg - Angle_range_2_3Msg);
+  Unscaned_Area[3] = Angle_Adjustment(Dont_Search_Angle_2Msg + Angle_range_2_3Msg);
+  Unscaned_Area[4] = Angle_Adjustment(Dont_Search_Angle_3Msg - Angle_range_2_3Msg);
+  Unscaned_Area[5] = Angle_Adjustment(Dont_Search_Angle_3Msg + Angle_range_2_3Msg);
+
+  for(int radius = Magn_Near_StartMsg ; radius <= Magn_Far_EndMsg ; radius += Magn_Near_GapMsg){
+    for(int angle = 0 ; angle < 360 ;){
+/////////////略過柱子
+      if(angle >= Unscaned_Area[0] && angle <= Unscaned_Area[1] ||
+         angle >= Unscaned_Area[2] && angle <= Unscaned_Area[3] ||
+         angle >= Unscaned_Area[4] && angle <= Unscaned_Area[5]){
+        angle += Angle_Interval(radius);
+        continue;
+      }
+/////////////掃描點的座標值
+      x = Frame_Area(CenterXMsg + radius*cos(angle*PI/180), oframe.cols);
+      y = Frame_Area(CenterYMsg - radius*sin(angle*PI/180), oframe.rows);//確認radius*sin(angle*PI/180)加減　是否圖形上下顛倒
+/////////////畫掃描點
+      oframe.data[(y*oframe.cols+x)*3+0] = 0;		//B
+      oframe.data[(y*oframe.cols+x)*3+1] = 255;	//G
+      oframe.data[(y*oframe.cols+x)*3+2] = 0;		//R
+      angle += Angle_Interval(radius);
+    }
+  }
+}
+///////////////////////////////////////////////////////////////////////////////////
+
 
