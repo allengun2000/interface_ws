@@ -706,7 +706,7 @@
                             </div>
                         </form>
                         <div id="InterfaceCamera" class="form-group">
-                             <img src="http://127.0.0.1:8080/stream?topic=/camera/image"> 
+                             <!--img src="http://127.0.0.1:8080/stream?topic=/camera/image"--> 
                             <canvas id="player">
                                 Your browser sucks.
                             </canvas>

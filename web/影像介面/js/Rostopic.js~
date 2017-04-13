@@ -213,6 +213,13 @@ function topicROSCheckButton(value) {
         checkpoint: 64
     });
     TopicParameterCheck.publish(ParameterCheck);
+    TopicCamera.publish();
+    TopicCenter.publish();
+    TopicScan.publish();
+    TopicColor.publish();
+    TopicWhite.publish();
+    TopicBlack.publish();
+    TopicColorButton.publish();
 }
 //===================================================================
 
