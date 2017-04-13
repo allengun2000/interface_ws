@@ -95,29 +95,30 @@ void InterfaceProc::Parameter_getting(const int x){
       HSV_blue.push_back(HSV_init[i]); HSV_yellow.push_back(HSV_init[i]);
 		  }
       nh.setParam("/FIRA/HSV/Ball",HSV_red);
-	    nh.setParam("/FIRA/HSV/Blue",HSV_blue);
-	    nh.setParam("/FIRA/HSV/Yellow",HSV_yellow);
-	    nh.setParam("/FIRA/HSV/Green",HSV_green);
+      nh.setParam("/FIRA/HSV/Blue",HSV_blue);
+      nh.setParam("/FIRA/HSV/Yellow",HSV_yellow);
+      nh.setParam("/FIRA/HSV/Green",HSV_green);
       nh.setParam("/FIRA/HSV/white/gray",0);
       nh.setParam("/FIRA/HSV/white/angle",0);
       nh.setParam("/FIRA/HSV/black/gray",0);
       nh.setParam("/FIRA/HSV/black/angle",0);
   /////////////////////////////////掃瞄點前置參數///////////////////////////////////
       scan_para.clear();
-	    scan_para.push_back(0);
-	    scan_para.push_back(0);
-	    scan_para.push_back(0);
-	    scan_para.push_back(0);
-	    scan_para.push_back(0);
-	    scan_para.push_back(0);
-	    scan_para.push_back(0);
-	    scan_para.push_back(0);
-	    scan_para.push_back(0);
-	    scan_para.push_back(0);
+	    scan_para.push_back(10);
+	    scan_para.push_back(10);
+	    scan_para.push_back(10);
+	    scan_para.push_back(10);
+	    scan_para.push_back(10);
+	    scan_para.push_back(10);
+	    scan_para.push_back(10);
+	    scan_para.push_back(10);
+	    scan_para.push_back(10);
+	    scan_para.push_back(10);
 	    scan_para.push_back(0);
 	    nh.setParam("/FIRA/scan_para",scan_para);
   ///////////////////////////////////FPS設定////////////////////////////////////////////////
 	    nh.setParam("/FIRA/FPS",60);
+	    nh.setParam("/prosilica_driver/exposure",0);
   //////////////////////////////////CNETER設定///////////////////////////////////////////////
 	    nh.setParam("/FIRA/Center/Center_X",350);
       nh.setParam("/FIRA/Center/Center_Y",252);
@@ -204,9 +205,9 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
     *ScanModels =ColorModel(*frame);
 
 	// Image Output
-    cv::imshow(OPENCV_WINDOW, *ColorModels);
-//	sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "mono16", *thresholdImg16).toImageMsg();
-//	image_pub_threshold_.publish(thresholdMsg);
+    /*cv::imshow(OPENCV_WINDOW, *ColorModels);
+	sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "mono16", *thresholdImg).toImageMsg();
+	image_pub_threshold_.publish(thresholdMsg);*/
 
 	cv::waitKey(3);
 /////////////////////////FPS設定///////////////////////////////////////	
@@ -226,9 +227,12 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 	}
       frame_counter = 0;
    }
-		fpsMsg=FrameRate;
-
-	//camera.publish(camera.msg);
+    get_campara();
+    int cam_fps;
+    if(camera_exposure != 0){
+      cam_fps = 1 / camera_exposure;
+      fpsMsg = cam_fps;
+    }
 //////////////////////////////////////////////////////////////////////
 
    switch(buttonmsg){
@@ -339,7 +343,6 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
 /////////////////////////FPS設定///////////////////////////////////////	
 cv::Mat InterfaceProc::CameraModel(const cv::Mat iframe){
   if(0<fpsMsg<=100){}else{fpsMsg=60;}//avoid code dump	
-  double Exposure_mm;
   Exposure_mm = 1000000 /fpsMsg;
   set_campara(Exposure_mm);
 }

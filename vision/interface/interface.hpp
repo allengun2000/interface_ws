@@ -120,12 +120,13 @@ public:
   int frame_counter;
   long int EndTime;
   long int dt;
+  double Exposure_mm;
   void set_campara(int value_ex){
     dynamic_reconfigure::ReconfigureRequest srv_req;
     dynamic_reconfigure::ReconfigureResponse srv_resp;
     dynamic_reconfigure::DoubleParameter double_param;
     dynamic_reconfigure::Config conf;
-    double exposure = (double)value_ex/1000000;
+    int exposure = (int)value_ex/1000000;
     double_param.name = "exposure";
     double_param.value = exposure;
     conf.doubles.push_back(double_param);
