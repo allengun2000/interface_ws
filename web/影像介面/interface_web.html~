@@ -217,7 +217,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <input name="ScanElement" class="RobotRange3" type="range" min="0" max="36" value="0" oninput="showValue(this.value,'ScanLabel',0);topicScanTransfer()" onchange="topicROSCheckButton(this.value);ParameterScanTransfer()"  />
+                                            <input name="ScanElement" class="RobotRange3" type="range" min="4" max="36" value="4" oninput="showValue(this.value,'ScanLabel',0);topicScanTransfer()" onchange="topicROSCheckButton(this.value);ParameterScanTransfer()"  />
                                         </td>
                                     </tr>
                                     <tr>
@@ -466,7 +466,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <input id="slider_Hue_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="0" max="359" oninput='sliderBarHue(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
+                                                <input id="slider_Hue_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="1" max="360" oninput='sliderBarHue(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
                                                 <input id="inputHue_Max" class="RBS2" type="number" oninput='inputHue(this.value,"Max");topicColorTransfer();topicROSCheckButton(this.value);ParameterHSVTransfer()'></input>
@@ -477,7 +477,7 @@
                                                 <label>Saturation</label>
                                             </td>
                                             <td>
-                                                <input id="slider_Sat_Bar_min" class="RobotRange5" name="HSVElement" type="range" min="0" max="100" oninput='sliderBarSat(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
+                                                <input id="slider_Sat_Bar_min" class="RobotRange5" name="HSVElement" type="range" min="0" max="99" oninput='sliderBarSat(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
                                                 <input id="inputSat_min" class="RBS2" type="number" oninput='inputSat(this.value,"min");topicColorTransfer()topicROSCheckButton(this.value);ParameterHSVTransfer()'></input>
@@ -485,7 +485,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <input id="slider_Sat_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="0" max="100" oninput='sliderBarSat(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
+                                                <input id="slider_Sat_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="1" max="100" oninput='sliderBarSat(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
                                                 <input id="inputSat_Max" class="RBS2" type="number" oninput='inputSat(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
@@ -496,7 +496,7 @@
                                                 <label>Value</label>
                                             </td>
                                             <td>
-                                                <input id="slider_Val_Bar_min" class="RobotRange5" name="HSVElement" type="range" min="0" max="100" oninput='sliderBarVal(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
+                                                <input id="slider_Val_Bar_min" class="RobotRange5" name="HSVElement" type="range" min="0" max="99" oninput='sliderBarVal(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
                                                 <input id="inputVal_min" class="RBS2" type="number" oninput='inputVal(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
@@ -504,7 +504,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <input id="slider_Val_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="0" max="100" oninput='sliderBarVal(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
+                                                <input id="slider_Val_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="1" max="100" oninput='sliderBarVal(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
                                                 <input id="inputVal_Max" class="RBS2" type="number" oninput='inputVal(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
@@ -706,7 +706,7 @@
                             </div>
                         </form>
                         <div id="InterfaceCamera" class="form-group">
-                             <!--img src="http://127.0.0.1:8080/stream?topic=/camera/image"--> 
+                             <img src="http://127.0.0.1:8080/stream?topic=/camera/image"> 
                             <canvas id="player">
                                 Your browser sucks.
                             </canvas>

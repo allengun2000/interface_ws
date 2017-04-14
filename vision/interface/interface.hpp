@@ -8,6 +8,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include "opencv2/core/core.hpp"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -26,6 +27,7 @@
 #include <dynamic_reconfigure/DoubleParameter.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/Config.h>
+#include <libv4l1-videodev.h>
 using namespace cv;
 
 
@@ -52,9 +54,6 @@ private:
 	cv::Mat *centermats;
 
  	
-
-
-
   cv::Mat *CenterModels;
   cv::Mat *ColorModels;
   cv::Mat *CameraModels;
@@ -99,6 +98,7 @@ public:
   int WhiteHSVBoxMsg[6];
   int ColorModeMsg;
   int paraMeterCheck;
+  cv::VideoCapture cap();
 
 	void imageCb(const sensor_msgs::ImageConstPtr&);
 	void ParameterButtonCall(const vision::parameterbutton);
@@ -120,7 +120,7 @@ public:
   int frame_counter;
   long int EndTime;
   long int dt;
-  double Exposure_mm;
+ /* double Exposure_mm;
   void set_campara(int value_ex){
     dynamic_reconfigure::ReconfigureRequest srv_req;
     dynamic_reconfigure::ReconfigureResponse srv_resp;
@@ -140,7 +140,7 @@ public:
       camera_exposure = 0;
       nh.getParam("/prosilica_driver/exposure",camera_exposure);
 	
-    }
+    }*/
 
 //////////////////////SCAN/////////////////////
   std::vector<int>scan_para;
