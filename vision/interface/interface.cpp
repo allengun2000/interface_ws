@@ -205,7 +205,7 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 
   cv::waitKey(3);
 /////////////////////////FPS設定///////////////////////////////////////	
-  /*frame_counter++;
+  frame_counter++;
   static long int StartTime = ros::Time::now().toNSec();
   static double FrameRate = 0.0;
   if(frame_counter == 10){
@@ -218,20 +218,20 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
         //cout << "FPS: " << FrameRate << endl;
       }
     }
-    frame_counter = 0;*/
+    frame_counter = 0;
   
-  /*get_campara();
+  get_campara();
   int cam_fps;
   if(camera_exposure != 0){
     cam_fps = 1 / camera_exposure;
     fpsMsg = cam_fps;
-  }*/
-  cv::VideoCapture cap("/dev/video0") ;
+  }
+  /*cv::VideoCapture cap("~/dev/video0") ;
  // cap.read("/usb_cam/image_raw");
   cap.set(CV_CAP_PROP_FOURCC,CV_FOURCC('M','J','P','G'));
   cap.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_COLS);
   cap.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_ROWS);
-  cap.set(CV_CAP_PROP_FPS, fpsMsg);
+  cap.set(CV_CAP_PROP_FPS, fpsMsg);*/
 //////////////////////////////////////////////////////////////////////
 
   switch(buttonmsg)
@@ -358,7 +358,7 @@ cv::Mat InterfaceProc::CameraModel(const cv::Mat iframe){
   if(0<fpsMsg<=100){}else{fpsMsg=60;}//avoid code dump	
   /*Exposure_mm = 1000000 /fpsMsg;
   set_campara(Exposure_mm);*/
-  cv::VideoCapture cap("/dev/video0") ;
+  cv::VideoCapture cap("~/dev/video0") ;
  // cap.read("/usb_cam/image_raw");
   cap.set(CV_CAP_PROP_FOURCC,CV_FOURCC('M','J','P','G'));
   cap.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_COLS);

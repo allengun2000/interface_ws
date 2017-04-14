@@ -226,7 +226,7 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
     cam_fps = 1 / camera_exposure;
     fpsMsg = cam_fps;
   }*/
-  cv::VideoCapture cap("/dev/video0") ;
+  cv::VideoCapture cap("~/dev/video0") ;
  // cap.read("/usb_cam/image_raw");
   cap.set(CV_CAP_PROP_FOURCC,CV_FOURCC('M','J','P','G'));
   cap.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_COLS);
@@ -358,7 +358,7 @@ cv::Mat InterfaceProc::CameraModel(const cv::Mat iframe){
   if(0<fpsMsg<=100){}else{fpsMsg=60;}//avoid code dump	
   /*Exposure_mm = 1000000 /fpsMsg;
   set_campara(Exposure_mm);*/
-  cv::VideoCapture cap("/usb_cam/image_raw") ;
+  cv::VideoCapture cap("~/dev/video0") ;
  // cap.read("/usb_cam/image_raw");
   cap.set(CV_CAP_PROP_FOURCC,CV_FOURCC('M','J','P','G'));
   cap.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_COLS);

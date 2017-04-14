@@ -27,6 +27,7 @@
 #include <dynamic_reconfigure/DoubleParameter.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/Config.h>
+#include <libv4l1-videodev.h>
 using namespace cv;
 
 

@@ -120,7 +120,7 @@ public:
   int frame_counter;
   long int EndTime;
   long int dt;
- /* double Exposure_mm;
+  double Exposure_mm;
   void set_campara(int value_ex){
     dynamic_reconfigure::ReconfigureRequest srv_req;
     dynamic_reconfigure::ReconfigureResponse srv_resp;
@@ -140,7 +140,7 @@ public:
       camera_exposure = 0;
       nh.getParam("/prosilica_driver/exposure",camera_exposure);
 	
-    }*/
+    }
 
 //////////////////////SCAN/////////////////////
   std::vector<int>scan_para;
