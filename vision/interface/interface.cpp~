@@ -151,6 +151,10 @@ InterfaceProc::InterfaceProc()
   Parameter_getting(1);
   image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
   image_pub_threshold_ = it_.advertise("/camera/image", 1);//http://localhost:8080/stream?topic=/camera/image webfor /camera/image
+  image_pub_threshold_ = it_.advertise("/camera/image", 1);
+  image_pub_threshold_ = it_.advertise("/camera/image", 1);
+  image_pub_threshold_ = it_.advertise("/camera/image", 1);
+  image_pub_threshold_ = it_.advertise("/camera/image", 1);
   s1 = nh.subscribe("interface/parameterbutton", 1000, &InterfaceProc::ParameterButtonCall, this);
   s2 = nh.subscribe("interface/color", 1000, &InterfaceProc::colorcall,this);
   s3 = nh.subscribe("interface/center", 1000, &InterfaceProc::centercall,this);
@@ -164,6 +168,7 @@ InterfaceProc::InterfaceProc()
   //cv::Mat iframe;
   frame=new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
   ColorModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
+  WhiteModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
   CenterModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
   ScanModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
   CameraModels = new cv::Mat(cv::Size(FRAME_COLS, FRAME_ROWS), CV_8UC3);
@@ -176,6 +181,7 @@ InterfaceProc::~InterfaceProc()
 {
   delete frame;
   delete ColorModels;
+  delete WhiteModels;
   delete CenterModels;
   delete ScanModels;
   delete CameraModels;
@@ -193,17 +199,18 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
   }
 
   *frame = cv_ptr->image;
-  *ColorModels =ColorModel(*frame);
+
+  *WhiteModels =WhiteModel(*frame);    
   *CenterModels =ColorModel(*frame);
   *CameraModels =ColorModel(*frame);
   *ScanModels =ColorModel(*frame);
 
   // Image Output
-  cv::imshow(OPENCV_WINDOW, *CameraModels);
+  //cv::imshow(OPENCV_WINDOW, *CameraModels);
+  cv::imshow(OPENCV_WINDOW, *WhiteModels);
   /*sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "mono16", *thresholdImg).toImageMsg();
   image_pub_threshold_.publish(thresholdMsg);*/
 
-  cv::waitKey(3);
 /////////////////////////FPS設定///////////////////////////////////////	
   /*frame_counter++;
   static long int StartTime = ros::Time::now().toNSec();
@@ -226,17 +233,18 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
     cam_fps = 1 / camera_exposure;
     fpsMsg = cam_fps;
   }*/
-  cv::VideoCapture cap("~/dev/video0") ;
+  /*cv::VideoCapture cap("~/dev/video0") ;
  // cap.read("/usb_cam/image_raw");
   cap.set(CV_CAP_PROP_FOURCC,CV_FOURCC('M','J','P','G'));
   cap.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_COLS);
   cap.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_ROWS);
-  cap.set(CV_CAP_PROP_FPS, fpsMsg);
+  cap.set(CV_CAP_PROP_FPS, fpsMsg);*/
 //////////////////////////////////////////////////////////////////////
 
   switch(buttonmsg)
   {
     case 1:
+      *ColorModels =ColorModel(*frame);
       *CameraModels=CameraModel(*frame);
       cv::imshow(OPENCV_WINDOW, *CameraModels);
       outputframe=CameraModels;
@@ -252,10 +260,28 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
       outputframe=ScanModels;
       break;
     case 4:
-      *ColorModels =ColorModel(*frame);
-      cv::imshow(OPENCV_WINDOW, *ColorModels);
-      outputframe=ColorModels;
-      break;
+          *ColorModels =ColorModel(*frame);
+          cv::imshow(OPENCV_WINDOW, *ColorModels);
+          outputframe=ColorModels;
+          break;
+      /*switch(buttonmsg)
+      {
+        case 1:
+          *ColorModels =ColorModel(*frame);
+          cv::imshow(OPENCV_WINDOW, *ColorModels);
+          outputframe=ColorModels;
+          break;
+        case 2:
+          *WhiteModels=WhiteModel(*frame);
+          cv::imshow(OPENCV_WINDOW, *WhiteModels);
+          outputframe=WhiteModels;
+          break;
+        case 3:
+          *BlackModels=BlackModel(*frame);
+          cv::imshow(OPENCV_WINDOW, *BlackModels);
+          outputframe=BlackModels;
+          break;
+      }*/
   }
   setMouseCallback(OPENCV_WINDOW, onMouse,NULL);
   if(onchick==1){
@@ -265,90 +291,109 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
   image_pub_threshold_.publish(thresholdMsg);
   cv::waitKey(3);
 }
-//////////////colormodel
+//////////////colormodel//////////////////////
 cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
 {
     static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
     for (int i = 0; i < iframe.rows; i++) {
-        for (int j = 0; j < iframe.cols; j++) {
-            double B = iframe.data[(i*iframe.cols*3)+(j*3)+2];//R
-            double G = iframe.data[(i*iframe.cols*3)+(j*3)+1];
-            double R = iframe.data[(i*iframe.cols*3)+(j*3)+0];//B
-            
-            double H,S,V;
-            V =(max(R,G)>max(G,B))?max(R,G):max(G,B);   //max(R,G,B);
-            double mn=(min(R,G)<min(G,B))?min(R,G):min(G,B);//min(R,G,B);
-            if(R==V){H=(G-B)/(V-mn);}
-            if(G==V){H=2+(B-R)/(V-mn);}
-            if(B==V){H=4+(R-G)/(V-mn);}
-            if(R==G&&G==B){H=0;}
-            H=H*60;
-            if(H<0){H=H+360;}
-            S=(((V-mn)*100)/V);
- //  usleep(300);
-            switch(ColorModeMsg){
-            case 0:
-                hmin = BallHSVBoxMsg[0];
-                hmax = BallHSVBoxMsg[1];
-                smin = BallHSVBoxMsg[2];
-                smax = BallHSVBoxMsg[3];
-                vmin = BallHSVBoxMsg[4];
-                vmax = BallHSVBoxMsg[5];
-                break;
-            case 1:
-                hmin = GreenHSVBoxMsg[0];
-                hmax = GreenHSVBoxMsg[1];
-                smin = GreenHSVBoxMsg[2];
-                smax = GreenHSVBoxMsg[3];
-                vmin = GreenHSVBoxMsg[4];
-                vmax = GreenHSVBoxMsg[5];
-                break;
-            case 2:
-                hmin = BlueHSVBoxMsg[0];
-                hmax = BlueHSVBoxMsg[1];
-                smin = BlueHSVBoxMsg[2];
-                smax = BlueHSVBoxMsg[3];
-                vmin = BlueHSVBoxMsg[4];
-                vmax = BlueHSVBoxMsg[5];
-                break;
-            case 3:
-                hmin = YellowHSVBoxMsg[0];
-                hmax = YellowHSVBoxMsg[1];
-                smin = YellowHSVBoxMsg[2];
-                smax = YellowHSVBoxMsg[3];
-                vmin = YellowHSVBoxMsg[4];
-                vmax = YellowHSVBoxMsg[5];
-                break;
-            case 4:
-                hmin = WhiteHSVBoxMsg[0];
-                hmax = WhiteHSVBoxMsg[1];
-                smin = WhiteHSVBoxMsg[2];
-                smax = WhiteHSVBoxMsg[3];
-                vmin = WhiteHSVBoxMsg[4];
-                vmax = WhiteHSVBoxMsg[5];
-                break;
-            }
-            hmax=360;
-            vmin=vmin*2.55;
-            vmax=vmax*2.55;
-            smin=smin*2.55;
-            smax=smax*2.55;    
-            if(  (H<=hmax)
-               &&(H>=hmin)
-               &&(S<=smax)
-               &&(S>=smin)
-               &&(V<=vmax)
-               &&(V>=vmin) ){
-              oframe.data[(i*iframe.cols*3)+(j*3)+0]=iframe.data[(i*iframe.cols*3)+(j*3)+0];
-              oframe.data[(i*iframe.cols*3)+(j*3)+1]=iframe.data[(i*iframe.cols*3)+(j*3)+1];
-              oframe.data[(i*iframe.cols*3)+(j*3)+2]=iframe.data[(i*iframe.cols*3)+(j*3)+2];}else{
-              oframe.data[(i*iframe.cols*3)+(j*3)+0] = 0;
-              oframe.data[(i*iframe.cols*3)+(j*3)+1] = 0;
-              oframe.data[(i*iframe.cols*3)+(j*3)+2] = 0;
-            }
+      for (int j = 0; j < iframe.cols; j++) {
+        double B = iframe.data[(i*iframe.cols*3)+(j*3)+2];//R
+        double G = iframe.data[(i*iframe.cols*3)+(j*3)+1];
+        double R = iframe.data[(i*iframe.cols*3)+(j*3)+0];//B
+        
+        double H,S,V,Max,Min;
+        Max =(max(R,G)>max(G,B))?max(R,G):max(G,B);   //max(R,G,B);
+        Min=(min(R,G)<min(G,B))?min(R,G):min(G,B);//min(R,G,B);
+       
+        if(R==Max){H=(G-B)/(Max-Min);}
+        if(G==Max){H=2+(B-R)/(Max-Min);}
+        if(B==Max){H=4+(R-G)/(Max-Min);}
+        if(R==G&&G==B){H=0;} 
+        H=H*60;
+        if(H<0){H=H+360;}
+        S=((Max-Min)*100/Max);
+        if(Max==0){S=0;}
+        V=Max;
+        //usleep(300);
+        switch(ColorModeMsg)
+        {
+          case 0:
+              hmin = BallHSVBoxMsg[0];
+              hmax = BallHSVBoxMsg[1];
+              smin = BallHSVBoxMsg[2];
+              smax = BallHSVBoxMsg[3];
+              vmin = BallHSVBoxMsg[4];
+              vmax = BallHSVBoxMsg[5];
+              break;
+          case 1:
+              hmin = GreenHSVBoxMsg[0];
+              hmax = GreenHSVBoxMsg[1];
+              smin = GreenHSVBoxMsg[2];
+              smax = GreenHSVBoxMsg[3];
+              vmin = GreenHSVBoxMsg[4];
+              vmax = GreenHSVBoxMsg[5];
+              break;
+          case 2:
+              hmin = BlueHSVBoxMsg[0];
+              hmax = BlueHSVBoxMsg[1];
+              smin = BlueHSVBoxMsg[2];
+              smax = BlueHSVBoxMsg[3];
+              vmin = BlueHSVBoxMsg[4];
+              vmax = BlueHSVBoxMsg[5];
+              break;
+          case 3:
+              hmin = YellowHSVBoxMsg[0];
+              hmax = YellowHSVBoxMsg[1];
+              smin = YellowHSVBoxMsg[2];
+              smax = YellowHSVBoxMsg[3];
+              vmin = YellowHSVBoxMsg[4];
+              vmax = YellowHSVBoxMsg[5];
+              break;
+          case 4:
+              hmin = WhiteHSVBoxMsg[0];
+              hmax = WhiteHSVBoxMsg[1];
+              smin = WhiteHSVBoxMsg[2];
+              smax = WhiteHSVBoxMsg[3];
+              vmin = WhiteHSVBoxMsg[4];
+              vmax = WhiteHSVBoxMsg[5];
+              break;
         }
-    }
-    
+
+        vmin=vmin*2.56;
+        vmax=vmax*2.56;
+        if(hmax>hmin){  
+          if(  (H<=hmax)
+             &&(H>=hmin)
+             &&(S<=smax)
+             &&(S>=smin)
+             &&(V<=vmax)
+             &&(V>=vmin) ){
+            oframe.data[(i*iframe.cols*3)+(j*3)+0] = iframe.data[(i*iframe.cols*3)+(j*3)+0];
+            oframe.data[(i*iframe.cols*3)+(j*3)+1] = iframe.data[(i*iframe.cols*3)+(j*3)+1];
+            oframe.data[(i*iframe.cols*3)+(j*3)+2] = iframe.data[(i*iframe.cols*3)+(j*3)+2];}else{
+            oframe.data[(i*iframe.cols*3)+(j*3)+0] = 0;
+            oframe.data[(i*iframe.cols*3)+(j*3)+1] = 0;
+            oframe.data[(i*iframe.cols*3)+(j*3)+2] = 0;
+
+
+          }
+        }else{
+          if( ((H>=0)&&(H<=hmax))||((H>=hmin)&&(H<=359))
+             &&(S<=smax)
+             &&(S>=smin)
+             &&(V<=vmax)
+             &&(V>=vmin) ){
+            oframe.data[(i*iframe.cols*3)+(j*3)+0] = 0;
+            oframe.data[(i*iframe.cols*3)+(j*3)+1] = 0;
+            oframe.data[(i*iframe.cols*3)+(j*3)+2] = 0;}else{
+            oframe.data[(i*iframe.cols*3)+(j*3)+0] = iframe.data[(i*iframe.cols*3)+(j*3)+0];
+            oframe.data[(i*iframe.cols*3)+(j*3)+1] = iframe.data[(i*iframe.cols*3)+(j*3)+1];
+            oframe.data[(i*iframe.cols*3)+(j*3)+2] = iframe.data[(i*iframe.cols*3)+(j*3)+2];
+
+          }
+        }
+      }
+    }    
     return oframe;
 }
 
@@ -439,7 +484,7 @@ int Angle_Adjustment(int angle){
 //middle start 到 far start 之間　Angle near gap的值為1/2
 //far start 之外 Angle near gap的值為1/4
 int InterfaceProc::Angle_Interval(int radius){
-	if (Angle_Near_GapMsg<=4){Angle_Near_GapMsg=4;}
+	//if (Angle_Near_GapMsg<=4){Angle_Near_GapMsg=4;}
   if(radius <= Magn_Middle_StartMsg) return Angle_Near_GapMsg;
   else if(radius > Magn_Middle_StartMsg && radius <= Magn_Far_StartMsg) return Angle_Near_GapMsg /2;
   else return Angle_Near_GapMsg /4;
@@ -449,10 +494,10 @@ cv::Mat InterfaceProc::ScanModel(const cv::Mat iframe){
 	if(0<Angle_Near_GapMsg<=36){}else{
 		Angle_Near_GapMsg=0;
 		Magn_Near_GapMsg=0;
-		Magn_Near_StartMsg=0;
-		Magn_Middle_StartMsg=0;
-		Magn_Far_StartMsg=0;
-		Magn_Far_EndMsg=0;
+		Magn_Near_StartMsg=10;
+		Magn_Middle_StartMsg=20;
+		Magn_Far_StartMsg=30;
+		Magn_Far_EndMsg=40;
 		Dont_Search_Angle_1Msg=0;
 		Dont_Search_Angle_2Msg=0;
 		Dont_Search_Angle_3Msg=0;
@@ -472,37 +517,83 @@ cv::Mat InterfaceProc::ScanModel(const cv::Mat iframe){
   Unscaned_Area[3] = Angle_Adjustment(Dont_Search_Angle_2Msg + Angle_range_2_3Msg);
   Unscaned_Area[4] = Angle_Adjustment(Dont_Search_Angle_3Msg - Angle_range_2_3Msg);
   Unscaned_Area[5] = Angle_Adjustment(Dont_Search_Angle_3Msg + Angle_range_2_3Msg);
-/////////////test
-	//Magn_Near_StartMsg=msg.Magn_Near_Start;
-	//Magn_Middle_StartMsg=msg.Magn_Middle_Start;
-	//Magn_Far_StartMsg=msg.Magn_Far_Start;
-	//Magn_Far_EndMsg=msg.Magn_Far_End;
-	//circle(oframe, Point(CenterXMsg,CenterYMsg), Magn_Near_StartMsg,   Scalar(0,0,255), 1);
-	//circle(oframe, Point(CenterXMsg,CenterYMsg), Magn_Middle_StartMsg, Scalar(0,0,255), 1);
-	//circle(oframe, Point(CenterXMsg,CenterYMsg), Magn_Far_StartMsg,    Scalar(0,0,255), 1);
-	//circle(oframe, Point(CenterXMsg,CenterYMsg), Magn_Far_EndMsg,      Scalar(0,0,255), 1);
-///////////////////
+
   for(int radius = Magn_Near_StartMsg ; radius <= Magn_Far_EndMsg ; radius += Magn_Near_GapMsg){
     for(int angle = 0 ; angle < 360 ;){
-/////////////略過柱子
+      //略過柱子
       if(angle >= Unscaned_Area[0] && angle <= Unscaned_Area[1] ||
          angle >= Unscaned_Area[2] && angle <= Unscaned_Area[3] ||
          angle >= Unscaned_Area[4] && angle <= Unscaned_Area[5]){
         angle += Angle_Interval(radius);
         continue;
       }
-/////////////掃描點的座標值
+      //掃描點的座標值
       x = Frame_Area(CenterXMsg + radius*cos(angle*PI/180), oframe.cols);
       y = Frame_Area(CenterYMsg - radius*sin(angle*PI/180), oframe.rows);//確認radius*sin(angle*PI/180)加減　是否圖形上下顛倒
-/////////////畫掃描點
+      //畫掃描點
       oframe.data[(y*oframe.cols+x)*3+0] = 0;		//B
       oframe.data[(y*oframe.cols+x)*3+1] = 255;	//G
       oframe.data[(y*oframe.cols+x)*3+2] = 0;		//R
       angle += Angle_Interval(radius);
+      //test
+      //circle(oframe, Point(CenterXMsg,CenterYMsg), Magn_Near_StartMsg,   Scalar(0,0,255), 1);
+      //circle(oframe, Point(CenterXMsg,CenterYMsg), Magn_Middle_StartMsg, Scalar(0,0,255), 1);
+      //circle(oframe, Point(CenterXMsg,CenterYMsg), Magn_Far_StartMsg,    Scalar(0,0,255), 1);
+      //circle(oframe, Point(CenterXMsg,CenterYMsg), Magn_Far_EndMsg,      Scalar(0,0,255), 1);
     }
+
   }
+
+
   return oframe;
 }
 ///////////////////////////////////////////////////////////////////////////////////
+cv::Mat InterfaceProc::WhiteModel(const cv::Mat iframe){
+    /*for(int i=0;i<frame_.rows;i++){
+        for(int j=0;j<frame_.cols;j++){
+            unsigned char gray = ( frame_.data[(i*frame_.cols*3)+(j*3)+0]
+                                 + frame_.data[(i*frame_.cols*3)+(j*3)+1]
+                                 + frame_.data[(i*frame_.cols*3)+(j*3)+2])/3;
+            if(gray< ui->Slider_Gray->value()){
+                frame_.data[(i*frame_.cols*3)+(j*3)+0] = 0;
+                frame_.data[(i*frame_.cols*3)+(j*3)+1] = 0;
+                frame_.data[(i*frame_.cols*3)+(j*3)+2] = 0;
+            }else{
+                frame_.data[(i*frame_.cols*3)+(j*3)+0] = 255;
+                frame_.data[(i*frame_.cols*3)+(j*3)+1] = 255;
+                frame_.data[(i*frame_.cols*3)+(j*3)+2] = 255;
+            }
+        }
+    }
+    for(int angle = 0; angle < 360; angle = angle+ui->Slider_Angle->value()){
+        double x_ = Angle_cos[angle];
+        double y_ = Angle_sin[angle];
+        for(int r = center_inner; r <= center_outer; r++){
+            int dis_x = x_*r;
+            int dis_y = y_*r;
+            if( frame_.data[((center_y-dis_y)*frame_.cols + center_x+dis_x)*3+0] == 255
+              &&frame_.data[((center_y-dis_y)*frame_.cols + center_x+dis_x)*3+1] == 255
+              &&frame_.data[((center_y-dis_y)*frame_.cols + center_x+dis_x)*3+2] == 255){
+                break;
+            }else{
+                frame_.data[((center_y-dis_y)*frame_.cols + center_x+dis_x)*3+0] = 0;
+                frame_.data[((center_y-dis_y)*frame_.cols + center_x+dis_x)*3+1] = 0;
+                frame_.data[((center_y-dis_y)*frame_.cols + center_x+dis_x)*3+2] = 255;
+            }
+        }
+    }
+    if(ui->White_sent->isDown()==true){
+        interface->sent_whiteline(ui->Slider_Gray->value(),ui->Slider_Angle->value());
+        ui->White_sent->setDown(0);
+    }
+    ui->Gray_num->setText(QString("%1").arg(ui->Slider_Gray->value()));
+    ui->Angle_num->setText(QString("%1").arg(ui->Slider_Angle->value()));
 
+    line(frame_, Point(center_x,center_y-center_inner), Point(center_x,center_y+center_inner), Scalar(0,255,0), 1);
+    line(frame_, Point(center_x-center_inner,center_y), Point(center_x+center_inner,center_y), Scalar(0,255,0), 1);
+
+    circle(frame_, Point(center_x,center_y), center_inner, Scalar(0,255,0), 0);
+    circle(frame_, Point(center_x,center_y), center_outer, Scalar(0,255,0), 0);*/
+    return iframe;
+}
 

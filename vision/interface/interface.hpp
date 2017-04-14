@@ -56,6 +56,7 @@ private:
  	
   cv::Mat *CenterModels;
   cv::Mat *ColorModels;
+  cv::Mat *WhiteModels;
   cv::Mat *CameraModels;
   cv::Mat *ScanModels;
   cv::Mat *outputframe;
@@ -164,6 +165,7 @@ public:
   int Angle_Interval(int);
 
   cv::Mat ColorModel(const cv::Mat iframe);
+  cv::Mat WhiteModel(const cv::Mat iframe);
   cv::Mat CenterModel(const cv::Mat iframe);
   cv::Mat ScanModel(const cv::Mat iframe);
   cv::Mat CameraModel(const cv::Mat iframe);
