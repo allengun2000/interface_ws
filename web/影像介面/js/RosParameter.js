@@ -29,6 +29,18 @@ function ParameterCenterTransfer(){
 	console.log(box);
 	ParameterCenter.set(box);
 }
+
+//colorbutton
+var ParameterColorbutton = new ROSLIB.Param({
+    ros: ros,
+    name: '/FIRA/colorbutton',
+});
+function ParametercolorbuttonTransfer(value){
+	var value;
+	
+	console.log(value);
+	ParameterColorbutton.set(value);
+}
 /*ParameterCenter.get(function(value) {
     if (value != null) {
         var obj = document.getElementsByName("CenterElement");

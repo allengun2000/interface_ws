@@ -458,7 +458,7 @@
                                                 <label>Hue</label>
                                             </td>
                                             <td>
-                                                <input id="slider_Hue_Bar_min" class="RobotRange5" name="HSVElement" type="range" min="0" max="359" oninput='sliderBarHue(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
+                                                <input id="slider_Hue_Bar_min" class="RobotRange5" name="HSVElement" type="range" min="0" max="358" oninput='sliderBarHue(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
                                                 <input id="inputHue_min" class="RBS2" type="number" oninput='inputHue(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);" ></input>
@@ -466,7 +466,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <input id="slider_Hue_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="1" max="360" oninput='sliderBarHue(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
+                                                <input id="slider_Hue_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="1" max="359" oninput='sliderBarHue(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
                                                 <input id="inputHue_Max" class="RBS2" type="number" oninput='inputHue(this.value,"Max");topicColorTransfer();topicROSCheckButton(this.value);ParameterHSVTransfer()'></input>

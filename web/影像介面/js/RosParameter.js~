@@ -29,6 +29,22 @@ function ParameterCenterTransfer(){
 	console.log(box);
 	ParameterCenter.set(box);
 }
+function ParameterCameraValue(){
+	var value = parseInt(document.getElementsByName('CameraElement')[0].value);
+	console.log(value);
+    ParameterCamera.set(value);
+}
+//colorbutton
+var ParameterColorbutton = new ROSLIB.Param({
+    ros: ros,
+    name: '/FIRA/colorbutton',
+});
+function ParametercolorbuttonTransfer(value){
+	var value;
+	
+	console.log(value);
+	ParameterColorbutton.set(value);
+}
 /*ParameterCenter.get(function(value) {
     if (value != null) {
         var obj = document.getElementsByName("CenterElement");
@@ -40,7 +56,7 @@ function ParameterCenterTransfer(){
 //ParameterScan
 var ParameterScan = new ROSLIB.Param({
     ros: ros,
-    name: '/FIRA/scan',
+    name: '/FIRA/scan_para',
 });
 function ParameterScanTransfer(){
 	var box = [];

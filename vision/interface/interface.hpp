@@ -56,8 +56,9 @@ private:
  	
   cv::Mat *CenterModels;
   cv::Mat *ColorModels;
-  cv::Mat *WhiteModels;
   cv::Mat *CameraModels;
+  cv::Mat *WhiteModels;
+  cv::Mat *BlackModels;
   cv::Mat *ScanModels;
   cv::Mat *outputframe;
  int hmax,hmin,smax,smin,vmax,vmin;
@@ -103,16 +104,15 @@ public:
 
 	void imageCb(const sensor_msgs::ImageConstPtr&);
 	void ParameterButtonCall(const vision::parameterbutton);
-  void colorcall(const vision::color);
-  void centercall(const vision::center);
-  void whitecall(const vision::white);
-  void cameracall(const vision::camera);
-  void blackcall(const vision::black);
-  void colorbuttoncall(const vision::colorbutton);
-  void scancall(const vision::scan);
+          void colorcall(const vision::color);
+          void centercall(const vision::center);
+          void whitecall(const vision::white);
+          void cameracall(const vision::camera);
+          void blackcall(const vision::black);
+          void colorbuttoncall(const vision::colorbutton);
+          void scancall(const vision::scan);
 	void Parameter_getting(const int x) ;
 	void Parameter_setting(const vision::parametercheck) ;
-
 	int mosue_x,mosue_y;
   int distance_space[100];
   int distance_pixel[100];
@@ -169,5 +169,6 @@ public:
   cv::Mat CenterModel(const cv::Mat iframe);
   cv::Mat ScanModel(const cv::Mat iframe);
   cv::Mat CameraModel(const cv::Mat iframe);
-
+  cv::Mat White_Line(const cv::Mat iframe);
+  cv::Mat Black_Line(const cv::Mat iframe);
 };
