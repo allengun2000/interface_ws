@@ -229,28 +229,19 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
       outputframe=ScanModels;
       break;
     case 4:
-     // *ColorModels =ColorModel(*frame);
-     // cv::imshow(OPENCV_WINDOW, *ColorModels);
-     // outputframe=ColorModels;
-     // break;
-                  *WhiteModels =White_Line(*frame);
-           cv::imshow(OPENCV_WINDOW, *WhiteModels);
-           outputframe=WhiteModels;  
-  /*switch(colorbottonMsg){
-        case 1:
-           *ColorModels =ColorModel(*frame);
-           cv::imshow(OPENCV_WINDOW, *ColorModels);
-           outputframe=ColorModels;
-           break;
-        case 2:
-           *WhiteModels =White_Line(*frame);
-           cv::imshow(OPENCV_WINDOW, *WhiteModels);
-           outputframe=WhiteModels;   
-        case 3:
-           *BlackModels =Black_Line(*frame);
-           cv::imshow(OPENCV_WINDOW, *BlackModels);
-           outputframe=BlackModels;
-         }*/
+      *ColorModels =ColorModel(*frame);
+      cv::imshow(OPENCV_WINDOW, *ColorModels);
+      outputframe=ColorModels;
+      break;
+     case 5:
+      *WhiteModels =White_Line(*frame);
+      cv::imshow(OPENCV_WINDOW, *WhiteModels);
+      outputframe=WhiteModels;   
+     case 6:
+      *BlackModels =Black_Line(*frame);
+      cv::imshow(OPENCV_WINDOW, *BlackModels);
+      outputframe=BlackModels;
+         
   }
  /* switch(colorbottonMsg){
         case 1:
@@ -575,7 +566,7 @@ cv::Mat InterfaceProc::White_Line(const cv::Mat iframe)
       }else{
         oframe.data[((CenterYMsg - y)*oframe.cols + CenterXMsg + x)*3+0] = 0;
         oframe.data[((CenterYMsg - y)*oframe.cols + CenterXMsg + x)*3+1] = 0;
-        oframe.data[((CenterYMsg - y)*oframe.cols + CenterXMsg + x)*3+2] = 255;
+        oframe.data[((CenterYMsg - y)*oframe.cols + CenterXMsg + x)*3+2] = 0;
       }
     }
   }
@@ -611,7 +602,7 @@ cv::Mat InterfaceProc::Black_Line(const cv::Mat iframe)
 {
   static cv::Mat oframe(cv::Size(iframe.cols,iframe.rows), CV_8UC3);
   oframe = iframe;
-  if(BlackGrayMsg<=100&&BlackGrayMsg>=0){}else{BlackGrayMsg=10;BlackAngleMsg=10;}
+  //if(BlackGrayMsg<=100&&BlackGrayMsg>=0){}else{BlackGrayMsg=10;BlackAngleMsg=10;}
   for(int i=0;i<oframe.rows;i++){
     for(int j=0;j<oframe.cols;j++){
       unsigned char gray = ( oframe.data[(i*oframe.cols*3)+(j*3)+0]

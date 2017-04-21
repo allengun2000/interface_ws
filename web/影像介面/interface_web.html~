@@ -75,13 +75,13 @@
                                     </td> -->
                                     <td>
                                         <div class="auto">
-                                            <input type="radio" id="ColorButton" name="ButtonElement" onclick="topicROSParameterButton(4)" />
+                                            <input type="radio" id="ColorButton" name="ButtonElement" />
                                             <label id="ColorButton" for="ColorButton">Color</label>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="auto">
-                                            <input type="radio" id="MonitorButton" name="ButtonElement" onclick="topicROSParameterButton(5)" />
+                                            <input type="radio" id="MonitorButton" name="ButtonElement" onclick="topicROSParameterButton(7)" />
                                             <label id="MonitorButton" for="MonitorButton">Monitor</label>
                                         </div>
                                     </td>
@@ -429,21 +429,21 @@
                                         <td>
                                             <div class="auto">
                                                 <input type="radio" id="HSVButton" name="radio" checked="checked" 
-                                                onclick="topicROSColorButton(1)"/>
+                                                onclick="topicROSParameterButton(4)">
                                                 <label id="HSVButton" for="HSVButton">HSV</label>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="auto">
                                                 <input type="radio" id="WhiteButton" name="radio" 
-                                                onclick="topicROSColorButton(2)"/>
+                                                onclick="topicROSParameterButton(5)"/>
                                                 <label id="WhiteButton" for="WhiteButton">White</label>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="auto">
                                                 <input type="radio" id="BlackButton" name="radio" 
-                                                onclick="topicROSColorButton(3)"/>
+                                                onclick="topicROSParameterButton(6)"/>
                                                 <label id="BlackButton" for="BlackButton">Black</label>
                                             </div>
                                         </td>
