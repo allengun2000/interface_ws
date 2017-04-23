@@ -147,6 +147,7 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
             double H,S,V;
             V =(max(R,G)>max(G,B))?max(R,G):max(G,B);   //max(R,G,B);
             double mn=(min(R,G)<min(G,B))?min(R,G):min(G,B);//min(R,G,B);
+            if(V==mn)V=mn+1;
             if(R==V){H=(G-B)*60/(V-mn);}
             if(G==V){H=120+(B-R)*60/(V-mn);}
             if(B==V){H=240+(R-G)*60/(V-mn);}
@@ -195,8 +196,8 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
                 vmin= WhiteHSVBoxMsg[4];
                 break;
             }
-            vmin=vmin*2.55;
-            vmax=vmax*2.55;
+            vmin=vmin*2.65;
+            vmax=vmax*2.65;
          if((H<=hmax)&&(S<=smax)&&(V<=vmax)&&(H>=hmin)&&(S>=smin )&&(V>=vmin) ){
             oframe.data[(i*iframe.cols*3)+(j*3)+0] = 0;
             oframe.data[(i*iframe.cols*3)+(j*3)+1] = 0;
