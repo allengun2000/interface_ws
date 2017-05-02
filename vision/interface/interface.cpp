@@ -1,8 +1,8 @@
 #define PI 3.14159265
 #include "interface.hpp"
 #include "math.h"
-#define FRAME_COLS 640 //width  x695
-#define FRAME_ROWS 484 //height y493
+#define FRAME_COLS 695 //width  x695
+#define FRAME_ROWS 493 //height y493
 #define IMAGE_TEST1 "/home/testa/image_transport_ws/src/interface_ws/vision/1.jpg"//圖片路徑
 static const std::string OPENCV_WINDOW = "Image window";
 using namespace std;
@@ -85,7 +85,7 @@ void InterfaceProc::scancall(const vision::scan msg)
 void InterfaceProc::Parameter_getting(const int x)
 {
 	  if(ifstream("default.yaml")){
-		system("rosparam load default.yaml /FIRA/");
+		system("rosparam load default.yaml");
 	    nh.getParam("/FIRA/HSV/Ball",HSV_red);
 		nh.getParam("/FIRA/HSV/Blue",HSV_blue);
 		nh.getParam("/FIRA/HSV/Yellow",HSV_yellow);
@@ -116,7 +116,7 @@ void InterfaceProc::Parameter_getting(const int x)
 		nh.getParam("/FIRA/Center/Outer",OuterMsg);
 		nh.getParam("/FIRA/Center/Front",FrontMsg);
 		nh.getParam("/FIRA/Center/Camera_high",Camera_HighMsg);
-	///////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////BUTTONMSG////////////////////////////////////////
 		nh.getParam("/FIRA/Parameterbutton",buttonmsg);
 	
     cout<<"read the YAML file"<<endl;
@@ -161,12 +161,14 @@ void InterfaceProc::Parameter_getting(const int x)
     nh.setParam("/FIRA/Center/Outer",363);
     nh.setParam("/FIRA/Center/Front",363);
     nh.setParam("/FIRA/Center/Camera_high",1);
+	
 ///////////////////////////////////////////////////////////////////////////////////////////
-    nh.setParam("/FIRA/Parameterbutton",1);
+    nh.setParam("/FIRA/Parameterbutton",2);
     system("rosparam dump Parameter.yaml");
     system("rosparam dump default.yaml");
     cout<<"Parameter is created "<<endl;
   }
+	cout<<CenterXMsg<<" "<<CenterYMsg<<endl;;
 }
 
 void InterfaceProc::Parameter_setting(const vision::parametercheck msg)
@@ -317,9 +319,9 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
       double G = test.val[1];
       double R = test.val[0];*/
 
-      double B = iframe.data[(i*iframe.cols*3)+(j*3)+2];//R
+      double B = iframe.data[(i*iframe.cols*3)+(j*3)+0];//R
       double G = iframe.data[(i*iframe.cols*3)+(j*3)+1];
-      double R = iframe.data[(i*iframe.cols*3)+(j*3)+0];//B
+      double R = iframe.data[(i*iframe.cols*3)+(j*3)+2];//B
       double H,S,V;
       double Max =(max(R,G)>max(G,B))?max(R,G):max(G,B);   //max(R,G,B);
       double Min=(min(R,G)<min(G,B))?min(R,G):min(G,B);//min(R,G,B);
@@ -420,7 +422,8 @@ cv::Mat InterfaceProc::CenterModel(const cv::Mat iframe)
   //cout<<CenterXMsg;
   if(0<CenterXMsg<600){}else{CenterXMsg=0;CenterYMsg=0;InnerMsg=0;OuterMsg=0;FrontMsg=0;}//avoid code dump
 
-  robotCenterX=iframe.cols*(CenterXMsg*0.0014388);robotCenterY=iframe.rows*(CenterYMsg*0.002028);
+  robotCenterX=CenterXMsg;//iframe.cols*(CenterXMsg*1);
+  robotCenterY=CenterYMsg;//iframe.rows*(CenterYMsg*1);
 
   circle(oframe, Point(robotCenterX,robotCenterY), 1, Scalar(0,255,0), 1);
   circle(oframe, Point(robotCenterX,robotCenterY), InnerMsg , Scalar(0,0,255), 1);
@@ -550,8 +553,8 @@ cv::Mat InterfaceProc::ScanModel(const cv::Mat iframe)
         continue;
       }
       //掃描點的座標值
-      x = Frame_Area(CenterXMsg + radius*cos(angle*PI/180), oframe.cols);//確認CenterXMsg
-      y = Frame_Area(CenterYMsg - radius*sin(angle*PI/180), oframe.rows);//確認radius*sin(angle*PI/180)加減　是否圖形上下顛倒
+      x = Frame_Area(robotCenterX + radius*cos(angle*PI/180), oframe.cols);//確認CenterXMsg
+      y = Frame_Area(robotCenterY - radius*sin(angle*PI/180), oframe.rows);//確認radius*sin(angle*PI/180)加減　是否圖形上下顛倒
       //畫掃描點
       oframe.data[(y*oframe.cols+x)*3+0] = 0;		//B
       oframe.data[(y*oframe.cols+x)*3+1] = 255;		//G

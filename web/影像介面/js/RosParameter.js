@@ -295,28 +295,46 @@ function ParameterHSVTransfer(){
     }
 }
 //ParameterWhite
-var ParameterWhite = new ROSLIB.Param({
+var ParameterWhite_gray = new ROSLIB.Param({
     ros: ros,
-    name: '/FIRA/HSV/white',
+    name: '/FIRA/HSV/white/gray',
 });
-function ParameterWhiteTransfer(){
-	var box = [];
+function ParameterWhite_grayTransfer(){
+	/*var box = [];
 	$("[name=WhiteElement]").each(function() {
 	    box.push(parseInt($(this).val()));
 	});
 	console.log(box);
-	ParameterWhite.set(box);
+	ParameterWhite.set(box);*/
+	var value = parseInt(document.getElementsByName('WhiteElement')[0].value);
+	console.log(value);
+	ParameterWhite_gray.set(value);
+}
+var ParameterWhite_angle = new ROSLIB.Param({
+    ros: ros,
+    name: '/FIRA/HSV/white/angle',
+});
+function ParameterWhite_angleTransfer(){
+	var value = parseInt(document.getElementsByName('WhiteElement')[0].value);
+	console.log(value);
+	ParameterWhite_angle.set(value);
 }
 //ParameterBlack
-var ParameterBlack = new ROSLIB.Param({
+var ParameterBlack_angle = new ROSLIB.Param({
     ros: ros,
-    name: '/FIRA/HSV/black',
+    name: '/FIRA/HSV/black/angle',
 });
-function ParameterBlackTransfer(){
-	var box = [];
-	$("[name=BlackElement]").each(function() {
-	    box.push(parseInt($(this).val()));
-	});
-	console.log(box);
-	ParameterBlack.set(box);
+function ParameterBlack_angleTransfer(){
+	var value = parseInt(document.getElementsByName('BlackElement')[0].value);
+	console.log(value);
+	ParameterBlack_angle.set(value);
+}
+var ParameterBlack_gray = new ROSLIB.Param({
+    ros: ros,
+    name: '/FIRA/HSV/black/gray',
+});
+function ParameterBlack_grayTransfer(){
+var value = parseInt(document.getElementsByName('BlackElement')[0].value);
+	console.log(value);
+	ParameterBlack_gray.set(value);
 }
