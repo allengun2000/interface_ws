@@ -27,7 +27,6 @@
 #include <dynamic_reconfigure/DoubleParameter.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/Config.h>
-#include <libv4l1-videodev.h>
 using namespace cv;
 
 
@@ -127,7 +126,7 @@ public:
     dynamic_reconfigure::ReconfigureResponse srv_resp;
     dynamic_reconfigure::DoubleParameter double_param;
     dynamic_reconfigure::Config conf;
-    int exposure = (int)value_ex/1000000;
+    double exposure = (double)value_ex/1000;
     double_param.name = "exposure";
     double_param.value = exposure;
     conf.doubles.push_back(double_param);
@@ -138,7 +137,7 @@ public:
 
     double camera_exposure;
     void get_campara(){
-      camera_exposure = 0;
+      camera_exposure = 0.025;
       nh.getParam("/prosilica_driver/exposure",camera_exposure);
 	
     }
