@@ -56,7 +56,7 @@ private:
   ros::NodeHandle nh;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
-	image_transport::Publisher image_pub_threshold_;
+  image_transport::Publisher image_pub_threshold_;
   ros::Publisher object_pub;
   ros::Subscriber s1;
   ros::Subscriber s2;
@@ -284,7 +284,7 @@ vector<BYTE> ColorFile()
   void Mark_point(Mat &, int, int, int, int, int &, int);
   void object_Item_reset(object_Item &);
   void find_around(Mat &, int, int, int &, int);
-  void object_compare(int, int);
+  //void object_compare(int, int);
   void draw_ellipse(Mat &, object_Item &);
   void draw_Line(Mat &, int, int, int);
 

@@ -209,6 +209,7 @@ InterfaceProc::InterfaceProc()
   //image_sub_ = it_.subscribe("usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
   image_pub_threshold_ = it_.advertise("/camera/image", 1);//http://localhost:8080/stream?topic=/camera/image webfor /camera/image
   object_pub = nh.advertise<vision::Object>("/vision/object",1);
+  camera_pub = nh.advertise<vision::camera>("/interface/camera_response",1);
   s1 = nh.subscribe("interface/parameterbutton", 1000, &InterfaceProc::ParameterButtonCall, this);
   s2 = nh.subscribe("interface/color", 1000, &InterfaceProc::colorcall,this);
   s3 = nh.subscribe("interface/center", 1000, &InterfaceProc::centercall,this);
@@ -352,6 +353,7 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
 //////////////////////處理影像開始//////////////////////////////////////
    switch(buttonmsg){
      case 1:
+     // camera_pub.publish(camera_msg);
       *CameraModels=CameraModel(*frame);
       cv::imshow(OPENCV_WINDOW, *CameraModels);
       outputframe=CameraModels;

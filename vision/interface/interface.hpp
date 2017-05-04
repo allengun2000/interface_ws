@@ -56,8 +56,9 @@ private:
   ros::NodeHandle nh;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
-	image_transport::Publisher image_pub_threshold_;
+  image_transport::Publisher image_pub_threshold_;
   ros::Publisher object_pub;
+  ros::Publisher camera_pub;
   ros::Subscriber s1;
   ros::Subscriber s2;
   ros::Subscriber s3;

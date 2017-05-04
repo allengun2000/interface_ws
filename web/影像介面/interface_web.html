@@ -199,7 +199,7 @@
                             <div id="CenterButtonDiv">
                                 <table>
                                     <td>
-                                        <input id="Button2" class="Button" type="button" value="Sent" onclick="ParameterCenterTransfer();topicROSCheckButton(this.value);">
+                                        <input id="Button2" class="Button" type="button" value="Sent" onclick="topicROSCheckButton(this.value);">
                                     </td>
                                 </table>
                             </div>
@@ -367,7 +367,7 @@
                             <div id="ScanButtonDiv">
                                 <table>
                                     <td>
-                                        <input id="ScanButton1" class="Button" type="button" value="Sent" onclick="ParameterScanTransfer();topicROSCheckButton(this.value)">
+                                        <input id="ScanButton1" class="Button" type="button" value="Sent" onclick="topicROSCheckButton(this.value)">
                                     </td>
                                 </table>
                             </div>
@@ -461,7 +461,7 @@
                                                 <input id="slider_Hue_Bar_min" class="RobotRange5" name="HSVElement" type="range" min="0" max="358" oninput='sliderBarHue(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
-                                                <input id="inputHue_min" class="RBS2" type="number" oninput='inputHue(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);" ></input>
+                                                <input id="inputHue_min" class="RBS2" type="number" name="HSVElement2" oninput='inputHue(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);" ></input>
                                             </td>
                                         </tr>
                                         <tr>
@@ -469,7 +469,7 @@
                                                 <input id="slider_Hue_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="1" max="359" oninput='sliderBarHue(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
-                                                <input id="inputHue_Max" class="RBS2" type="number" oninput='inputHue(this.value,"Max");topicColorTransfer();topicROSCheckButton(this.value);ParameterHSVTransfer()'></input>
+                                                <input id="inputHue_Max" class="RBS2" type="number" name="HSVElement2" oninput='inputHue(this.value,"Max");topicColorTransfer();topicROSCheckButton(this.value);ParameterHSVTransfer()'></input>
                                             </td>
                                         </tr>
                                         <tr>
@@ -480,7 +480,7 @@
                                                 <input id="slider_Sat_Bar_min" class="RobotRange5" name="HSVElement" type="range" min="0" max="99" oninput='sliderBarSat(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
-                                                <input id="inputSat_min" class="RBS2" type="number" oninput='inputSat(this.value,"min");topicColorTransfer()topicROSCheckButton(this.value);ParameterHSVTransfer()'></input>
+                                                <input id="inputSat_min" class="RBS2" type="number" name="HSVElement2" oninput='inputSat(this.value,"min");topicColorTransfer()topicROSCheckButton(this.value);ParameterHSVTransfer()'></input>
                                             </td>
                                         </tr>
                                         <tr>
@@ -488,7 +488,7 @@
                                                 <input id="slider_Sat_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="1" max="100" oninput='sliderBarSat(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
-                                                <input id="inputSat_Max" class="RBS2" type="number" oninput='inputSat(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
+                                                <input id="inputSat_Max" class="RBS2" type="number" name="HSVElement2" oninput='inputSat(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                         </tr>
                                         <tr>
@@ -499,7 +499,7 @@
                                                 <input id="slider_Val_Bar_min" class="RobotRange5" name="HSVElement" type="range" min="0" max="99" oninput='sliderBarVal(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
-                                                <input id="inputVal_min" class="RBS2" type="number" oninput='inputVal(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
+                                                <input id="inputVal_min" class="RBS2" type="number" name="HSVElement2" oninput='inputVal(this.value,"min");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                         </tr>
                                         <tr>
@@ -507,7 +507,7 @@
                                                 <input id="slider_Val_Bar_Max" class="RobotRange5" name="HSVElement" type="range" min="1" max="100" oninput='sliderBarVal(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                             <td>
-                                                <input id="inputVal_Max" class="RBS2" type="number" oninput='inputVal(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
+                                                <input id="inputVal_Max" class="RBS2" type="number" name="HSVElement2" oninput='inputVal(this.value,"Max");topicColorTransfer()' onchange="topicROSCheckButton(this.value);ParameterHSVTransfer()" ></input>
                                             </td>
                                         </tr>
                                     </table>
@@ -534,7 +534,7 @@
                                                 <button id="sendHSV" type="button" class="Button" onmousedown="showHsvColor();ParameterHSVTransfer();topicROSCheckButton(value);ParameterHSVTransfer()">Save</button>
                                             </td>
                                             <td>
-                                                <select id="HSVSelect">
+                                                <select id="HSVSelect" onchange="ColorRecord(this.value)">
                                                     <option value = "0">Orange</option>
                                                     <option value = "1">Green</option>
                                                     <option value = "2">Blue</option>
@@ -766,6 +766,7 @@
     <script src="js/video.js"></script>
     <script src="js/Rostopic.js"></script>
     <script src="js/RosParameter.js"></script>
+    <script src="js/ColorRecord.js"></script>
     <script src="js/HSV.js"></script>
     <script>
     $("#ParameterButton").buttonset();
