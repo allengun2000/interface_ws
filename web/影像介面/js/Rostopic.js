@@ -243,7 +243,7 @@ Monitor.subscribe(function(msg) {
     MBox.push(msg.yellow_LR);
     MBox.push(msg.yellow_dis);
     MBox.push(msg.yellow_ang);
-    console.log(MBox);
+    //console.log(MBox);
     document.getElementsByName('MonitorElement')[0].innerText = MBox[0];
     document.getElementsByName('MonitorElement')[1].innerText = '( '+MBox[1]+','+MBox[2]+' )';
     document.getElementsByName('MonitorElement')[2].innerText = MBox[3];

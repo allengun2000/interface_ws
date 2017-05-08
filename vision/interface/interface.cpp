@@ -54,6 +54,13 @@ void InterfaceProc::centercall(const vision::center msg)
   OuterMsg=msg.Outer;
   FrontMsg=msg.Front;
   Camera_HighMsg=msg.Camera_High;
+
+  center_x=msg.CenterX;
+  center_y=msg.CenterY;
+  center_inner=msg.Inner;
+  center_outer=msg.Outer;
+  center_front=msg.Front;
+  Camera_H=msg.Camera_High;
 }
 void InterfaceProc::whitecall(const vision::white msg)
 {
@@ -86,95 +93,131 @@ void InterfaceProc::scancall(const vision::scan msg)
   Dont_Search_Angle_3Msg=msg.Dont_Search_Angle_3;
   Angle_range_1Msg=msg.Angle_range_1;
   Angle_range_2_3Msg=msg.Angle_range_2_3;
+
+  search_angle    = msg.Angle_Near_Gap;
+  search_distance = msg.Magn_Near_Gap;
+  search_start    = msg.Magn_Near_Start;
+  search_near     = msg.Magn_Middle_Start;
+  search_middle   = msg.Magn_Far_Start;
+  search_end      = msg.Magn_Far_End;
+
+  dont_angle[0] = msg.Dont_Search_Angle_1;
+  dont_angle[1] = msg.Dont_Search_Angle_2;
+  dont_angle[2] = msg.Dont_Search_Angle_3;
+  dont_angle[3] = msg.Angle_range_1;
+  dont_angle[4] = msg.Angle_range_2_3;
+  dont_angle[5] = msg.Angle_range_2_3;
 }
 
 void InterfaceProc::Parameter_getting(const int x)
 {
 	  if(ifstream("default.yaml")){
 		system("rosparam load default.yaml");
-	    nh.getParam("/FIRA/HSV/Ball",HSV_red);
-		nh.getParam("/FIRA/HSV/Blue",HSV_blue);
-		nh.getParam("/FIRA/HSV/Yellow",HSV_yellow);
-		nh.getParam("/FIRA/HSV/Green",HSV_green);
-		nh.getParam("/FIRA/HSV/white/gray",WhiteGrayMsg);
-		nh.getParam("/FIRA/HSV/white/angle",WhiteAngleMsg);
-		nh.getParam("/FIRA/HSV/black/gray",BlackGrayMsg);
-		nh.getParam("/FIRA/HSV/black/angle",BlackAngleMsg);
-	/////////////////////////////////掃瞄點前置參數///////////////////////////////////
-		  nh.getParam("/FIRA/SCAN/Angle_Near_Gap",Angle_Near_GapMsg);
-		  nh.getParam("/FIRA/SCAN/Magn_Near_Gap",Magn_Near_GapMsg);
-		  nh.getParam("/FIRA/SCAN/Magn_Near_Start",Magn_Near_StartMsg);
-		  nh.getParam("/FIRA/SCAN/Magn_Middle_Start",Magn_Middle_StartMsg);
-		  nh.getParam("/FIRA/SCAN/Magn_Far_Start",Magn_Far_StartMsg);
-		  nh.getParam("/FIRA/SCAN/Magn_Far_End",Magn_Far_EndMsg);
-		  nh.getParam("/FIRA/SCAN/Dont_Search_Angle_1",Dont_Search_Angle_1Msg);
-		  nh.getParam("/FIRA/SCAN/Dont_Search_Angle_2",Dont_Search_Angle_2Msg);
-		  nh.getParam("/FIRA/SCAN/Dont_Search_Angle_3",Dont_Search_Angle_3Msg);
-		  nh.getParam("/FIRA/SCAN/Angle_range_1",Angle_range_1Msg);
-		  nh.getParam("/FIRA/SCAN/Angle_range_2_3",Angle_range_2_3Msg);
-	///////////////////////////////////FPS設定////////////////////////////////////////////////
-		nh.getParam("/FIRA/FPS",fpsMsg);
-		get_campara();
-	//////////////////////////////////CNETER設定///////////////////////////////////////////////
-		nh.getParam("/FIRA/Center/Center_X",CenterXMsg);
-		nh.getParam("/FIRA/Center/Center_Y",CenterYMsg);
-		nh.getParam("/FIRA/Center/Inner",InnerMsg);
-		nh.getParam("/FIRA/Center/Outer",OuterMsg);
-		nh.getParam("/FIRA/Center/Front",FrontMsg);
-		nh.getParam("/FIRA/Center/Camera_high",Camera_HighMsg);
-	/////////////////////////////////////BUTTONMSG////////////////////////////////////////
-		nh.getParam("/FIRA/Parameterbutton",buttonmsg);
-	
-    cout<<"read the YAML file"<<endl;
-
   }
 
   else{
     HSV_init[0] = 0; HSV_init[1] = 360;
-    HSV_init[2] = 0; HSV_init[3] = 255;
-    HSV_init[4] = 0; HSV_init[5] = 255;
+    HSV_init[2] = 0; HSV_init[3] = 100;
+    HSV_init[4] = 0; HSV_init[5] = 100;
     for(int i=0;i<6;i++){
       HSV_red.push_back(HSV_init[i]);  HSV_green.push_back(HSV_init[i]);
       HSV_blue.push_back(HSV_init[i]); HSV_yellow.push_back(HSV_init[i]);
     }
-     nh.setParam("/FIRA/HSV/Ball",HSV_red);
-     nh.setParam("/FIRA/HSV/Blue",HSV_blue);
-     nh.setParam("/FIRA/HSV/Yellow",HSV_yellow);
-     nh.setParam("/FIRA/HSV/Green",HSV_green);
-     nh.setParam("/FIRA/HSV/white/gray",50);
-     nh.setParam("/FIRA/HSV/white/angle",50);
-     nh.setParam("/FIRA/HSV/black/gray",50);
-     nh.setParam("/FIRA/HSV/black/angle",50);
+  nh.setParam("/FIRA/HSV/Ball",HSV_red);
+  nh.setParam("/FIRA/HSV/Blue",HSV_blue);
+  nh.setParam("/FIRA/HSV/Yellow",HSV_yellow);
+  nh.setParam("/FIRA/HSV/Green",HSV_green);
+  nh.setParam("/FIRA/HSV/ColorMode",1);
+  nh.setParam("/FIRA/HSV/white/gray",50);
+  nh.setParam("/FIRA/HSV/white/angle",50);
+  nh.setParam("/FIRA/HSV/black/gray",50);
+  nh.setParam("/FIRA/HSV/black/angle",50);
 /////////////////////////////////掃瞄點前置參數///////////////////////////////////
-	  nh.setParam("/FIRA/SCAN/Angle_Near_Gap",20);
-	  nh.setParam("/FIRA/SCAN/Magn_Near_Gap",50);
-	  nh.setParam("/FIRA/SCAN/Magn_Near_Start",120);
-	  nh.setParam("/FIRA/SCAN/Magn_Middle_Start",120);
-	  nh.setParam("/FIRA/SCAN/Magn_Far_Start",120);
-	  nh.setParam("/FIRA/SCAN/Magn_Far_End",120);
-	  nh.setParam("/FIRA/SCAN/Dont_Search_Angle_1",175);
-	  nh.setParam("/FIRA/SCAN/Dont_Search_Angle_2",175);
-	  nh.setParam("/FIRA/SCAN/Dont_Search_Angle_3",175);
-	  nh.setParam("/FIRA/SCAN/Angle_range_1",45);
-	  nh.setParam("/FIRA/SCAN/Angle_range_2_3",20);
+  nh.setParam("/FIRA/SCAN/Angle_Near_Gap",20);
+  nh.setParam("/FIRA/SCAN/Magn_Near_Gap",50);
+  nh.setParam("/FIRA/SCAN/Magn_Near_Start",120);
+  nh.setParam("/FIRA/SCAN/Magn_Middle_Start",120);
+  nh.setParam("/FIRA/SCAN/Magn_Far_Start",120);
+  nh.setParam("/FIRA/SCAN/Magn_Far_End",120);
+  nh.setParam("/FIRA/SCAN/Dont_Search_Angle_1",175);
+  nh.setParam("/FIRA/SCAN/Dont_Search_Angle_2",175);
+  nh.setParam("/FIRA/SCAN/Dont_Search_Angle_3",175);
+  nh.setParam("/FIRA/SCAN/Angle_range_1",45);
+  nh.setParam("/FIRA/SCAN/Angle_range_2_3",20);
 ///////////////////////////////////FPS設定////////////////////////////////////////////////
-    nh.setParam("/FIRA/FPS",25);
-	get_campara();
+  nh.setParam("/FIRA/FPS",25);
+  get_campara();
 //////////////////////////////////CNETER設定///////////////////////////////////////////////
-    nh.setParam("/FIRA/Center/Center_X",363);
-    nh.setParam("/FIRA/Center/Center_Y",363);
-    nh.setParam("/FIRA/Center/Inner",363);
-    nh.setParam("/FIRA/Center/Outer",363);
-    nh.setParam("/FIRA/Center/Front",363);
-    nh.setParam("/FIRA/Center/Camera_high",1);
+  nh.setParam("/FIRA/Center/Center_X",367);
+  nh.setParam("/FIRA/Center/Center_Y",271);
+  nh.setParam("/FIRA/Center/Inner",91);
+  nh.setParam("/FIRA/Center/Outer",40);
+  nh.setParam("/FIRA/Center/Front",146);
+  nh.setParam("/FIRA/Center/Camera_high",1);
 	
 ///////////////////////////////////////////////////////////////////////////////////////////
-    nh.setParam("/FIRA/Parameterbutton",2);
-    system("rosparam dump Parameter.yaml");
-    system("rosparam dump default.yaml");
-    cout<<"Parameter is created "<<endl;
+  nh.setParam("/FIRA/Parameterbutton",2);
+  system("rosparam dump Parameter.yaml");
+  system("rosparam dump default.yaml");
+  cout<<"Parameter is created "<<endl;
   }
-	cout<<CenterXMsg<<" "<<CenterYMsg<<endl;;
+
+  nh.getParam("/FIRA/HSV/Ball",HSV_red);
+  nh.getParam("/FIRA/HSV/Blue",HSV_blue);
+  nh.getParam("/FIRA/HSV/Yellow",HSV_yellow);
+  nh.getParam("/FIRA/HSV/Green",HSV_green);
+  nh.getParam("/FIRA/HSV/ColorMode",ColorModeMsg);
+  nh.getParam("/FIRA/HSV/white/gray",WhiteGrayMsg);
+  nh.getParam("/FIRA/HSV/white/angle",WhiteAngleMsg);
+  nh.getParam("/FIRA/HSV/black/gray",BlackGrayMsg);
+  nh.getParam("/FIRA/HSV/black/angle",BlackAngleMsg);
+/////////////////////////////////掃瞄點前置參數///////////////////////////////////
+  nh.getParam("/FIRA/SCAN/Angle_Near_Gap",Angle_Near_GapMsg);
+  nh.getParam("/FIRA/SCAN/Magn_Near_Gap",Magn_Near_GapMsg);
+  nh.getParam("/FIRA/SCAN/Magn_Near_Start",Magn_Near_StartMsg);
+  nh.getParam("/FIRA/SCAN/Magn_Middle_Start",Magn_Middle_StartMsg);
+  nh.getParam("/FIRA/SCAN/Magn_Far_Start",Magn_Far_StartMsg);
+  nh.getParam("/FIRA/SCAN/Magn_Far_End",Magn_Far_EndMsg);
+  nh.getParam("/FIRA/SCAN/Dont_Search_Angle_1",Dont_Search_Angle_1Msg);
+  nh.getParam("/FIRA/SCAN/Dont_Search_Angle_2",Dont_Search_Angle_2Msg);
+  nh.getParam("/FIRA/SCAN/Dont_Search_Angle_3",Dont_Search_Angle_3Msg);
+  nh.getParam("/FIRA/SCAN/Angle_range_1",Angle_range_1Msg);
+  nh.getParam("/FIRA/SCAN/Angle_range_2_3",Angle_range_2_3Msg);
+
+  search_angle    = Angle_Near_GapMsg;
+  search_distance = Magn_Near_GapMsg;
+  search_start    = Magn_Near_StartMsg;
+  search_near     = Magn_Middle_StartMsg;
+  search_middle   = Magn_Far_StartMsg;
+  search_end      = Magn_Far_EndMsg;
+
+  dont_angle[0] = Dont_Search_Angle_1Msg;
+  dont_angle[1] = Dont_Search_Angle_2Msg;
+  dont_angle[2] = Dont_Search_Angle_3Msg;
+  dont_angle[3] = Angle_range_1Msg;
+  dont_angle[4] = Angle_range_2_3Msg;
+  dont_angle[5] = Angle_range_2_3Msg;
+///////////////////////////////////////FPS設定////////////////////////////////////////////////
+	nh.getParam("/FIRA/FPS",fpsMsg);
+	get_campara();
+ /////// CNETER設定///////////////////////////////////////////////
+  nh.getParam("/FIRA/Center/Center_X",CenterXMsg);
+  nh.getParam("/FIRA/Center/Center_Y",CenterYMsg);
+  nh.getParam("/FIRA/Center/Inner",InnerMsg);
+  nh.getParam("/FIRA/Center/Outer",OuterMsg);
+  nh.getParam("/FIRA/Center/Front",FrontMsg);
+  nh.getParam("/FIRA/Center/Camera_high",Camera_HighMsg);
+
+  center_x=CenterXMsg;
+  center_y=CenterYMsg;
+  center_inner=InnerMsg;
+  center_outer=OuterMsg;
+  center_front=FrontMsg;
+  Camera_H=Camera_HighMsg;
+/////////////////////////////////////BUTTONMSG////////////////////////////////////////
+  nh.getParam("/FIRA/Parameterbutton",buttonmsg);
+	
+    cout<<"read the YAML file"<<endl;
 }
 
 void InterfaceProc::Parameter_setting(const vision::parametercheck msg)
@@ -209,7 +252,7 @@ InterfaceProc::InterfaceProc()
   //image_sub_ = it_.subscribe("usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
   image_pub_threshold_ = it_.advertise("/camera/image", 1);//http://localhost:8080/stream?topic=/camera/image webfor /camera/image
   object_pub = nh.advertise<vision::Object>("/vision/object",1);
-  camera_pub = nh.advertise<vision::camera>("/interface/camera_response",1);
+  //camera_pub = nh.advertise<vision::camera>("/interface/camera_response",1);
   s1 = nh.subscribe("interface/parameterbutton", 1000, &InterfaceProc::ParameterButtonCall, this);
   s2 = nh.subscribe("interface/color", 1000, &InterfaceProc::colorcall,this);
   s3 = nh.subscribe("interface/center", 1000, &InterfaceProc::centercall,this);
@@ -255,9 +298,17 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
   }
   *frame = cv_ptr->image;
   *outputframe = *frame;
-   vision_path = ros::package::getPath("vision");
+  // vision_path = ros::package::getPath("vision");
 
     color_map = ColorFile();
+
+    double ang_PI;
+
+    for(int ang=0 ; ang<360; ang++){
+      ang_PI = ang*PI/180;
+      Angle_sin.push_back(sin(ang_PI));
+      Angle_cos.push_back(cos(ang_PI));
+    }
 
   //cv::imshow(OPENCV_WINDOW, *frame);
 	// Image Output
@@ -284,9 +335,8 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
     object_Item_reset(Obstacle_Item[2]);
     object_Item_reset(Obstacle_Item[3]);
     object_Item_reset(Obstacle_Item[4]);
-
     creat_Obstclemap(Obstaclemap,OBSTACLEITEM);
-    creat_FIRA_map(Obstaclemap,FIRA_map);
+    creat_FIRA_map(Obstaclemap,FIRA_map);	
     objectdet_Obstacle(Findmap,OBSTACLEITEM,Obstacle_Item);
 
     vision::Object object_msg;
@@ -336,20 +386,23 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
       if( dt!=0 )
       {
               FrameRate = ( 1000000000.0 / dt ) * ALPHA + FrameRate * ( 1.0 - ALPHA );
-              //cout << "FPS: " << FrameRate << endl;
+              cout << "FPS: " << FrameRate << endl;
       }
       frame_counter = 0;
     }
     object_msg.fps = FrameRate;
-
     ///////////////////////////////////////////////
     Findmap.release();
     FIRA_map.release();
     Obstaclemap.release();
     Erodemap.release();
     Dilatemap.release();
-
-    object_pub.publish(object_msg);
+     //object_pub.publish(object_msg);
+	topic_counter++;
+    if(topic_counter==10){
+     object_pub.publish(object_msg);
+     topic_counter=0;
+    }
 //////////////////////處理影像開始//////////////////////////////////////
    switch(buttonmsg){
      case 1:
@@ -479,8 +532,8 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
           vmin = WhiteHSVBoxMsg[4];
           break;
       }
-      vmin=vmin*2.56;
-      vmax=vmax*2.56;
+      vmin=vmin*2.55;
+      vmax=vmax*2.55;
       if(hmax>hmin){
         if((H<=hmax)&&(H>=hmin)&&(S<=smax)&&(S>=smin)&&(V<=vmax)&&(V>=vmin) ){
           oframe.data[(i*iframe.cols*3)+(j*3)+0] = 0;
@@ -782,7 +835,6 @@ void InterfaceProc::objectdet_change(Mat &frame_, int color, object_Item &obj_it
   frame_ = Mat(Size(Main_frame.cols,Main_frame.rows),CV_8UC3,Scalar(0,0,0));
 
   find_point.clear();
-
   object_Item_reset(FIND_Item);
 
   for(int distance = search_start ; distance <= search_end ; distance += search_distance){
@@ -794,7 +846,6 @@ void InterfaceProc::objectdet_change(Mat &frame_, int color, object_Item &obj_it
         angle += angle_for_distance(distance);
         continue;
       }
-
       object_size = 0;
       FIND_Item.size = 0;
 
@@ -807,7 +858,6 @@ void InterfaceProc::objectdet_change(Mat &frame_, int color, object_Item &obj_it
       unsigned char B = Main_frame.data[(y*Main_frame.cols+x)*3+0];
       unsigned char G = Main_frame.data[(y*Main_frame.cols+x)*3+1];
       unsigned char R = Main_frame.data[(y*Main_frame.cols+x)*3+2];
-
       if(color_map[R+(G<<8)+(B<<16)] & color && frame_.data[(y*frame_.cols+x)*3+0] == 0){
         Mark_point(frame_, distance, angle ,x , y, object_size, color);
         FIND_Item.dis_max = distance;
@@ -815,6 +865,7 @@ void InterfaceProc::objectdet_change(Mat &frame_, int color, object_Item &obj_it
         FIND_Item.ang_max = angle;
         FIND_Item.ang_min = angle;
         while(!find_point.empty()){
+
           dis = find_point.front();
           find_point.pop_front();
 
@@ -946,7 +997,6 @@ void InterfaceProc::creat_FIRA_map(Mat &frame_input , Mat &frame_output){
         y = Frame_area(frame_center_y-y_,frame_output.rows);
 
         points[angle] = Point(x, y);
-
 //        frame_output.data[y*frame_output.cols+x] = 255;
 
         break;
@@ -964,7 +1014,6 @@ void InterfaceProc::creat_FIRA_map(Mat &frame_input , Mat &frame_output){
       y = Frame_area(frame_center_y-y_,frame_output.rows);
 
       points[angle] = Point(x, y);
-
 //      frame_output.data[y*frame_output.cols+x] = 255;
     }
     distance_get = 0;
@@ -1093,7 +1142,6 @@ double InterfaceProc::Omni_distance_monitor(double dis_pixel){
   double r = atan2(f,pixel_dis*0.0099);
 
   dis = Z*(pow(b,2)-pow(c,2))*cos(r) / ((pow(b,2)+pow(c,2))*sin(r) - 2*b*c);
-
   if(dis/10 < 0 || dis/10 > 999){
     dis = 9990;
  }

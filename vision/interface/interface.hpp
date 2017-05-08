@@ -30,7 +30,7 @@
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/Config.h>
 #include <ros/package.h>
-#define FILE_PATH "/config/HSVcolormap.bin"
+#define FILE_PATH "HSVcolormap.bin"
 using namespace cv;
 using namespace std;
 typedef unsigned char BYTE;
@@ -67,12 +67,11 @@ private:
   ros::Subscriber s6;
   ros::Subscriber s7;
   ros::Subscriber s8;
-	ros::Subscriber s9;
+  ros::Subscriber s9;
 
 
-
-	cv::Mat *frame;
-	cv::Mat *centermats;
+  cv::Mat *frame;
+  cv::Mat *centermats;
 
   cv::Mat Main_frame;
   cv::Mat Findmap;
@@ -108,7 +107,7 @@ private:
   double Camera_f;
   int center_x, center_y, center_inner, center_outer, center_front;
 
-  std::string vision_path;
+  //std::string vision_path;
 
 public:
   InterfaceProc();
@@ -217,7 +216,7 @@ void object_compare(int distance ,int angle){
 //////////////////////////色彩空間////////////////////////////
 vector<BYTE> ColorFile()
 {
-  string Filename = vision_path+FILE_PATH;
+  string Filename = FILE_PATH;
   const char *Filename_Path = Filename.c_str();
 
     // open the file:
@@ -235,7 +234,8 @@ vector<BYTE> ColorFile()
 
 ///////////////////////////////////////////////////////////
 ///////////////////////FPS////////////////////////
-  int frame_counter;
+  int frame_counter=0;
+  int topic_counter=0;
   long int EndTime;
   long int dt;
   double Exposure_mm;
