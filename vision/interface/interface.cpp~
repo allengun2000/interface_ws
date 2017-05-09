@@ -247,11 +247,11 @@ InterfaceProc::InterfaceProc()
   ros::NodeHandle n("~");	
   Parameter_getting(1);	
   init_data();
-  //
-  image_sub_ = it_.subscribe("/camera/image_raw", 1, &InterfaceProc::imageCb, this);
-  //image_sub_ = it_.subscribe("usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
+  //image_sub_ = it_.subscribe("/camera/image_raw", 1, &InterfaceProc::imageCb, this);
+  image_sub_ = it_.subscribe("usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
   image_pub_threshold_ = it_.advertise("/camera/image", 1);//http://localhost:8080/stream?topic=/camera/image webfor /camera/image
   object_pub = nh.advertise<vision::Object>("/vision/object",1);
+  CenterDis_pub = nh.advertise<vision::dis>("/interface/CenterDis",1);
   //camera_pub = nh.advertise<vision::camera>("/interface/camera_response",1);
   s1 = nh.subscribe("interface/parameterbutton", 1000, &InterfaceProc::ParameterButtonCall, this);
   s2 = nh.subscribe("interface/color", 1000, &InterfaceProc::colorcall,this);
@@ -298,7 +298,7 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
   }
   *frame = cv_ptr->image;
   *outputframe = *frame;
-  // vision_path = ros::package::getPath("vision");
+   vision_path = ros::package::getPath("vision");
 
     color_map = ColorFile();
 
@@ -316,8 +316,8 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
   //sensor_msgs::ImagePtr thresholdMsg = cv_bridge::CvImage(std_msgs::Header(), "mono16", *thresholdImg16).toImageMsg();
   //image_pub_threshold_.publish(thresholdMsg);
 	cv::waitKey(3);
-  cv::flip(cv_ptr->image, Main_frame, 1);
-
+  //cv::flip(cv_ptr->image, Main_frame, 1);
+    Main_frame=cv_ptr->image.clone();
     Obstaclemap = Mat(Size(Main_frame.cols,Main_frame.rows),CV_8UC3,Scalar(0,0,0));
 
     object_Item_reset(Red_Item);
@@ -373,6 +373,7 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
       object_msg.yellow_ang = 999;
       object_msg.yellow_dis = 999;
     }
+
     /////////////////////FPS///////////////////////
 
     frame_counter++;
@@ -386,7 +387,7 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
       if( dt!=0 )
       {
               FrameRate = ( 1000000000.0 / dt ) * ALPHA + FrameRate * ( 1.0 - ALPHA );
-              cout << "FPS: " << FrameRate << endl;
+              //cout << "FPS: " << FrameRate << endl;
       }
       frame_counter = 0;
     }
@@ -398,8 +399,8 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
     Erodemap.release();
     Dilatemap.release();
      //object_pub.publish(object_msg);
-	topic_counter++;
-    if(topic_counter==5){
+    topic_counter++;
+    if(topic_counter==10){
      object_pub.publish(object_msg);
      topic_counter=0;
     }
@@ -430,28 +431,18 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
      case 5:
 	  *WhiteModels =White_Line(*frame);
       cv::imshow(OPENCV_WINDOW, *WhiteModels);
-      outputframe=WhiteModels;   
+      outputframe=WhiteModels;  
+      break; 
      case 6:
       *BlackModels =Black_Line(*frame);
       cv::imshow(OPENCV_WINDOW, *BlackModels);
       outputframe=BlackModels;
-         
+      break;
+      case 7:
+      cv::imshow(OPENCV_WINDOW, Main_frame);
+      *outputframe=Main_frame;
+      break;
   }
-  /*switch(colorbottonMsg){
-        case 1:
-           *ColorModels =ColorModel(*frame);
-           cv::imshow(OPENCV_WINDOW, *ColorModels);
-           outputframe=ColorModels;
-           break;
-        case 2:
-           *WhiteModels =White_Line(*frame);
-           cv::imshow(OPENCV_WINDOW, *WhiteModels);
-           outputframe=WhiteModels;   
-        case 3:
-           *BlackModels =Black_Line(*frame);
-           cv::imshow(OPENCV_WINDOW, *BlackModels);
-           outputframe=BlackModels;
-  }*/
 
   setMouseCallback(OPENCV_WINDOW, onMouse,NULL);
   if(onclick==1){
@@ -477,16 +468,19 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
       double G = iframe.data[(i*iframe.cols*3)+(j*3)+1];
       double R = iframe.data[(i*iframe.cols*3)+(j*3)+2];//B
       double H,S,V;
-      double Max =(max(R,G)>max(G,B))?max(R,G):max(G,B);   //max(R,G,B);
-      double Min=(min(R,G)<min(G,B))?min(R,G):min(G,B);//min(R,G,B);
-	  if(Max==Min)Max+=1;
+      double Max = (max(R,G)>max(G,B))?max(R,G):max(G,B);   //max(R,G,B);
+      double Min = (min(R,G)<min(G,B))?min(R,G):min(G,B);   //min(R,G,B);
+
+      if(Max==Min)Max+=1;
       if(R==Max){H=(G-B)*60/(Max-Min);}
       if(G==Max){H=120+(B-R)*60/(Max-Min);}
       if(B==Max){H=240+(R-G)*60/(Max-Min);}
       if(B==G&&B==R) H=0;
       if(H<0){H=H+360;}
+
       S=(((Max-Min)*100)/Max);
       if(Max==0)S=0;
+
       V=Max;
       //  usleep(300);
       switch(ColorModeMsg)
@@ -532,8 +526,10 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
           vmin = WhiteHSVBoxMsg[4];
           break;
       }
-      vmin=vmin*2.55;
-      vmax=vmax*2.55;
+      //smin=smin*2.56;
+      //smax=smax*2.56;
+      vmin=vmin*2.56;
+      vmax=vmax*2.56;
       if(hmax>hmin){
         if((H<=hmax)&&(H>=hmin)&&(S<=smax)&&(S>=smin)&&(V<=vmax)&&(V>=vmin) ){
           oframe.data[(i*iframe.cols*3)+(j*3)+0] = 0;
@@ -553,10 +549,111 @@ cv::Mat InterfaceProc::ColorModel(const cv::Mat iframe)
           oframe.data[(i*iframe.cols*3)+(j*3)+2] = iframe.data[(i*iframe.cols*3)+(j*3)+2];
         } 
       }
+/*
+      //开操作 (去除一些噪点)
+    	Mat element = getStructuringElement(MORPH_RECT, Size(5, 5));
+   	  morphologyEx(oframe, oframe, MORPH_OPEN, element);
+
+   	 //闭操作 (连接一些连通域)
+   	 morphologyEx(oframe, oframe, MORPH_CLOSE, element);
+		Mat erodeStruct = getStructuringElement(MORPH_RECT,Size(20,20));
+    erode(oframe, oframe, erodeStruct);
+*/
+
     }
   }
+
+	//侵蝕
+	Mat Erosionomg(Size(oframe.cols,oframe.rows),CV_8UC3);
+	for(int i=0;i<oframe.rows*oframe.cols*3;i++)Erosionomg.data[i] = oframe.data[i];
+	for(int i=1;i<Erosionomg.rows-1;i++){
+		for(int j=1;j<Erosionomg.cols-1;j++){
+			if (Erosionomg.data[((i-1)*Erosionomg.cols*3)+((j-1)*3)+0] == 0
+			  &&Erosionomg.data[((i-1)*Erosionomg.cols*3)+((j+0)*3)+0] == 0
+			  &&Erosionomg.data[((i-1)*Erosionomg.cols*3)+((j+1)*3)+0] == 0
+			  &&Erosionomg.data[((i+0)*Erosionomg.cols*3)+((j-1)*3)+0] == 0
+			  &&Erosionomg.data[((i+0)*Erosionomg.cols*3)+((j+1)*3)+0] == 0
+			  &&Erosionomg.data[((i+1)*Erosionomg.cols*3)+((j-1)*3)+0] == 0
+			  &&Erosionomg.data[((i+1)*Erosionomg.cols*3)+((j+0)*3)+0] == 0
+			  &&Erosionomg.data[((i+1)*Erosionomg.cols*3)+((j+1)*3)+0] == 0
+				
+				&&Erosionomg.data[((i-1)*Erosionomg.cols*3)+((j-1)*3)+1] == 0
+			  &&Erosionomg.data[((i-1)*Erosionomg.cols*3)+((j+0)*3)+1] == 0
+			  &&Erosionomg.data[((i-1)*Erosionomg.cols*3)+((j+1)*3)+1] == 0
+			  &&Erosionomg.data[((i+0)*Erosionomg.cols*3)+((j-1)*3)+1] == 0
+			  &&Erosionomg.data[((i+0)*Erosionomg.cols*3)+((j+1)*3)+1] == 0
+			  &&Erosionomg.data[((i+1)*Erosionomg.cols*3)+((j-1)*3)+1] == 0
+			  &&Erosionomg.data[((i+1)*Erosionomg.cols*3)+((j+0)*3)+1] == 0
+			  &&Erosionomg.data[((i+1)*Erosionomg.cols*3)+((j+1)*3)+1] == 0
+
+				&&Erosionomg.data[((i-1)*Erosionomg.cols*3)+((j-1)*3)+2] == 0
+			  &&Erosionomg.data[((i-1)*Erosionomg.cols*3)+((j+0)*3)+2] == 0
+			  &&Erosionomg.data[((i-1)*Erosionomg.cols*3)+((j+1)*3)+2] == 0
+			  &&Erosionomg.data[((i+0)*Erosionomg.cols*3)+((j-1)*3)+2] == 0
+			  &&Erosionomg.data[((i+0)*Erosionomg.cols*3)+((j+1)*3)+2] == 0
+			  &&Erosionomg.data[((i+1)*Erosionomg.cols*3)+((j-1)*3)+2] == 0
+			  &&Erosionomg.data[((i+1)*Erosionomg.cols*3)+((j+0)*3)+2] == 0
+			  &&Erosionomg.data[((i+1)*Erosionomg.cols*3)+((j+1)*3)+2] == 0)
+			{
+				oframe.data[(i*oframe.cols*3)+(j*3)+0] = 0;
+				oframe.data[(i*oframe.cols*3)+(j*3)+1] = 0;
+		    oframe.data[(i*oframe.cols*3)+(j*3)+2] = 0;		
+			}else{
+
+			}
+		}
+	}
+
+
+	//膨脹
+	Mat Erosionomg2(Size(oframe.cols,oframe.rows),CV_8UC3);
+	for(int i=0;i<oframe.rows*oframe.cols*3;i++)Erosionomg2.data[i] = oframe.data[i];
+	for(int i=1;i<Erosionomg2.rows-1;i++){
+		for(int j=1;j<Erosionomg2.cols-1;j++){
+			if (Erosionomg2.data[((i-1)*Erosionomg2.cols*3)+((j-1)*3)+0] == 0
+			  ||Erosionomg2.data[((i-1)*Erosionomg2.cols*3)+((j+0)*3)+0] == 0
+			  ||Erosionomg2.data[((i-1)*Erosionomg2.cols*3)+((j+1)*3)+0] == 0
+			  ||Erosionomg2.data[((i+0)*Erosionomg2.cols*3)+((j-1)*3)+0] == 0
+			  ||Erosionomg2.data[((i+0)*Erosionomg2.cols*3)+((j+1)*3)+0] == 0
+			  ||Erosionomg2.data[((i+1)*Erosionomg2.cols*3)+((j-1)*3)+0] == 0
+			  ||Erosionomg2.data[((i+1)*Erosionomg2.cols*3)+((j+0)*3)+0] == 0
+			  ||Erosionomg2.data[((i+1)*Erosionomg2.cols*3)+((j+1)*3)+0] == 0
+				
+				||Erosionomg2.data[((i-1)*Erosionomg2.cols*3)+((j-1)*3)+1] == 0
+			  ||Erosionomg2.data[((i-1)*Erosionomg2.cols*3)+((j+0)*3)+1] == 0
+			  ||Erosionomg2.data[((i-1)*Erosionomg2.cols*3)+((j+1)*3)+1] == 0
+			  ||Erosionomg2.data[((i+0)*Erosionomg2.cols*3)+((j-1)*3)+1] == 0
+			  ||Erosionomg2.data[((i+0)*Erosionomg2.cols*3)+((j+1)*3)+1] == 0
+			  ||Erosionomg2.data[((i+1)*Erosionomg2.cols*3)+((j-1)*3)+1] == 0
+			  ||Erosionomg2.data[((i+1)*Erosionomg2.cols*3)+((j+0)*3)+1] == 0
+			  ||Erosionomg2.data[((i+1)*Erosionomg2.cols*3)+((j+1)*3)+1] == 0
+
+				||Erosionomg2.data[((i-1)*Erosionomg2.cols*3)+((j-1)*3)+2] == 0
+			  ||Erosionomg2.data[((i-1)*Erosionomg2.cols*3)+((j+0)*3)+2] == 0
+			  ||Erosionomg2.data[((i-1)*Erosionomg2.cols*3)+((j+1)*3)+2] == 0
+			  ||Erosionomg2.data[((i+0)*Erosionomg2.cols*3)+((j-1)*3)+2] == 0
+			  ||Erosionomg2.data[((i+0)*Erosionomg2.cols*3)+((j+1)*3)+2] == 0
+			  ||Erosionomg2.data[((i+1)*Erosionomg2.cols*3)+((j-1)*3)+2] == 0
+			  ||Erosionomg2.data[((i+1)*Erosionomg2.cols*3)+((j+0)*3)+2] == 0
+			  ||Erosionomg2.data[((i+1)*Erosionomg2.cols*3)+((j+1)*3)+2] == 0)
+			{
+				oframe.data[(i*oframe.cols*3)+(j*3)+0] = 0;
+				oframe.data[(i*oframe.cols*3)+(j*3)+1] = 0;
+		    oframe.data[(i*oframe.cols*3)+(j*3)+2] = 0;		
+			}else{
+
+			}
+		}
+	}
+
   return oframe;
 }
+
+
+
+///////////////////////////////////////////////////////////////////
+
+
 ///////////////////////////////////////////////////////////////////////////////////
 /////////////////////////FPS///////////////////////////////////////////////////
 cv::Mat InterfaceProc::CameraModel(const cv::Mat iframe)
@@ -617,6 +714,10 @@ double InterfaceProc::Omni_distance(int object_x , int object_y)
   dis = Z*(pow(b,2)-pow(c,2))*cos(r) / ((pow(b,2)+pow(c,2))*sin(r) - 2*b*c);
   //dis/=10;
   ROS_INFO("b = %f c = %f r=%f dis=%f",b,c,r,dis);
+  
+  vision::dis dis_msg;
+  dis_msg.distance=dis;
+  CenterDis_pub.publish(dis_msg);
   return dis;
 }
 ///////////////////////////////////////////////////////////////////////////////////
@@ -911,6 +1012,12 @@ void InterfaceProc::objectdet_change(Mat &frame_, int color, object_Item &obj_it
   draw_ellipse(Main_frame,Red_Item);
   draw_ellipse(Main_frame,Yellow_Item);
   draw_ellipse(Main_frame,Blue_Item);
+     if(Red_Item.x!=0)
+     Draw_cross(Main_frame,'R');
+     if(Blue_Item.x!=0)
+     Draw_cross(Main_frame,'B');  
+     if(Yellow_Item.x!=0)
+     Draw_cross(Main_frame,'Y');
 }
 
 void InterfaceProc::creat_Obstclemap(Mat &frame_, int color){
@@ -1142,9 +1249,9 @@ double InterfaceProc::Omni_distance_monitor(double dis_pixel){
   double r = atan2(f,pixel_dis*0.0099);
 
   dis = Z*(pow(b,2)-pow(c,2))*cos(r) / ((pow(b,2)+pow(c,2))*sin(r) - 2*b*c);
-  if(dis/10 < 0 || dis/10 > 999){
+ /* if(dis/10 < 0 || dis/10 > 999){
     dis = 9990;
- }
+ }*/
   return dis/10;
 }
 void InterfaceProc::find_around(Mat &frame_, int distance ,int angle, int &size, int color){
@@ -1362,4 +1469,53 @@ void InterfaceProc::draw_Line(Mat &frame_, int obj_distance_max, int obj_distanc
   y[1] = Frame_area(center_y-y_,frame_.rows);
 
   line(frame_, Point(x[0],y[0]), Point(x[1],y[1]), Scalar(255,255,0), 1);
+}
+void InterfaceProc::Draw_cross(cv::Mat &frame_,char color){
+    switch(color){
+    case 'R':
+        for(int i=-2;i<=2;i++){
+            frame_.data[((Red_Item.y+i)*frame_.cols*3)+((Red_Item.x+0)*3)+0] = 0;
+            frame_.data[((Red_Item.y+i)*frame_.cols*3)+((Red_Item.x+0)*3)+1] = 255;
+            frame_.data[((Red_Item.y+i)*frame_.cols*3)+((Red_Item.x+0)*3)+2] = 0;
+        }
+        for(int j=-2;j<=2;j++){
+            frame_.data[((Red_Item.y+0)*frame_.cols*3)+((Red_Item.x+j)*3)+0] = 0;
+            frame_.data[((Red_Item.y+0)*frame_.cols*3)+((Red_Item.x+j)*3)+1] = 255;
+            frame_.data[((Red_Item.y+0)*frame_.cols*3)+((Red_Item.x+j)*3)+2] = 0;
+        }
+				cv::putText(frame_, string("R"), Point(Red_Item.x,Red_Item.y), 0, 0.5, Scalar(0,0,255),1);
+        //ui->localization_ball->setGeometry(Red_Item.x,Red_Item.y-inity,300,80);
+        
+    break;
+    case 'B':
+        for(int i=-2;i<=2;i++){
+            frame_.data[((Blue_Item.y+i)*frame_.cols*3)+((Blue_Item.x+0)*3)+0] = 0;
+            frame_.data[((Blue_Item.y+i)*frame_.cols*3)+((Blue_Item.x+0)*3)+1] = 0;
+            frame_.data[((Blue_Item.y+i)*frame_.cols*3)+((Blue_Item.x+0)*3)+2] = 255;
+        }
+        for(int j=-2;j<=2;j++){
+            frame_.data[((Blue_Item.y+0)*frame_.cols*3)+((Blue_Item.x+j)*3)+0] = 0;
+            frame_.data[((Blue_Item.y+0)*frame_.cols*3)+((Blue_Item.x+j)*3)+1] = 0;
+            frame_.data[((Blue_Item.y+0)*frame_.cols*3)+((Blue_Item.x+j)*3)+2] = 255;
+        }
+				cv::putText(frame_, string("B"), Point(Blue_Item.x,Blue_Item.y), 0, 0.5, Scalar(255,0,0),1);
+       // ui->localization_bluedoor->setGeometry(Blue_Item.x,Blue_Item.y-inity,300,80);
+       //ui->localization_bluedoor->setText(tr("<font color=blue>B(%1 : %2)</font>").arg(Blue_Item.x).arg(Blue_Item.y));
+    break;
+    case 'Y':
+        for(int i=-2;i<=2;i++){
+            frame_.data[((Yellow_Item.y+i)*frame_.cols*3)+((Yellow_Item.x+0)*3)+0] = 255;
+            frame_.data[((Yellow_Item.y+i)*frame_.cols*3)+((Yellow_Item.x+0)*3)+1] = 0;
+            frame_.data[((Yellow_Item.y+i)*frame_.cols*3)+((Yellow_Item.x+0)*3)+2] = 0;
+        }
+        for(int j=-2;j<=2;j++){
+            frame_.data[((Yellow_Item.y+0)*frame_.cols*3)+((Yellow_Item.x+j)*3)+0] = 255;
+            frame_.data[((Yellow_Item.y+0)*frame_.cols*3)+((Yellow_Item.x+j)*3)+1] = 0;
+            frame_.data[((Yellow_Item.y+0)*frame_.cols*3)+((Yellow_Item.x+j)*3)+2] = 0;
+        }
+				cv::putText(frame_, string("Y"), Point(Yellow_Item.x,Red_Item.y), 0, 0.5, Scalar(0,255,255),1);
+        //ui->localization_yellowdoor->setGeometry(Yellow_Item.x,Yellow_Item.y-inity,300,80);
+        //ui->localization_yellowdoor->setText(tr("<font color=yellow>Y(%1 : %2)</font>").arg(Yellow_Item.x).arg(Yellow_Item.y));
+    break;
+    }
 }

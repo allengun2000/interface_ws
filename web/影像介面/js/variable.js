@@ -15,3 +15,6 @@ var GreenBox = [];
 var BlueBox = [];
 var YellowBox = [];
 var WhiteBox = [];
+
+//
+var ButtonFlag = 0;

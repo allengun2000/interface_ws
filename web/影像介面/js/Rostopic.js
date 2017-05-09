@@ -8,6 +8,10 @@ var TopicParameterButton = new ROSLIB.Topic({
 
 function topicROSParameterButton(value) {
     console.log(value);
+    if(value == 8)
+    {
+        value = ButtonFlag;
+    }
     var ParameterButton = new ROSLIB.Message({
         button: value
     });
@@ -35,6 +39,11 @@ var TopicCenter = new ROSLIB.Topic({
     name: '/interface/center',
     messageType: '/vision/center'
 });
+var SubTopicCenter = new ROSLIB.Topic({
+    ros: ros,
+    name: '/interface/CenterDis',
+    messageType: '/vision/dis'
+});
 
 function topicCenterTransfer() {
     var box = [];
@@ -57,6 +66,9 @@ function topicROSCenter(box) {
     });
     TopicCenter.publish(Center);
 }
+SubTopicCenter.subscribe(function(msg) {   
+    document.getElementsByName('CenterDisLabel')[0].innerText = msg.dis;
+});
 //===================================================================
 //scan
 var TopicScan = new ROSLIB.Topic({

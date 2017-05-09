@@ -23,6 +23,7 @@
 #include "vision/scan.h"
 #include "vision/color.h"
 #include "vision/Object.h"
+#include "vision/dis.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -30,7 +31,7 @@
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/Config.h>
 #include <ros/package.h>
-#define FILE_PATH "HSVcolormap.bin"
+#define FILE_PATH "/config/HSVcolormap.bin"
 using namespace cv;
 using namespace std;
 typedef unsigned char BYTE;
@@ -58,7 +59,7 @@ private:
   image_transport::Subscriber image_sub_;
   image_transport::Publisher image_pub_threshold_;
   ros::Publisher object_pub;
-  ros::Publisher camera_pub;
+  ros::Publisher CenterDis_pub;
   ros::Subscriber s1;
   ros::Subscriber s2;
   ros::Subscriber s3;
@@ -107,7 +108,7 @@ private:
   double Camera_f;
   int center_x, center_y, center_inner, center_outer, center_front;
 
-  //std::string vision_path;
+  std::string vision_path;
 
 public:
   InterfaceProc();
@@ -216,7 +217,7 @@ void object_compare(int distance ,int angle){
 //////////////////////////色彩空間////////////////////////////
 vector<BYTE> ColorFile()
 {
-  string Filename = FILE_PATH;
+  string Filename =vision_path + FILE_PATH;
   const char *Filename_Path = Filename.c_str();
 
     // open the file:
@@ -288,8 +289,9 @@ vector<BYTE> ColorFile()
   //void object_compare(int, int);
   void draw_ellipse(Mat &, object_Item &);
   void draw_Line(Mat &, int, int, int);
-
+  void Draw_cross(cv::Mat &,char);
   void find_object_point(object_Item &, int);
+
   double camera_f(int Omni_pixel);
   double Omni_distance(int object_x , int object_y);
   double Omni_distance_monitor(double);
