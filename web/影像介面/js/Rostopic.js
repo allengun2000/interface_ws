@@ -66,8 +66,9 @@ function topicROSCenter(box) {
     });
     TopicCenter.publish(Center);
 }
-SubTopicCenter.subscribe(function(msg) {   
-    document.getElementsByName('CenterDisLabel')[0].innerText = msg.dis;
+SubTopicCenter.subscribe(function(msg) { 
+    console.log(msg.distance);  
+    document.getElementsByName('CenterDisLabel')[0].innerText = msg.distance;
 });
 //===================================================================
 //scan
@@ -272,4 +273,21 @@ Monitor.subscribe(function(msg) {
     document.getElementsByName('MonitorElement')[11].innerText = MBox[14];
     document.getElementsByName('MonitorElement')[12].innerText = MBox[15];
 });
+//====================================================================
+//(X,Y)
+var TopicPosition = new ROSLIB.Topic({
+    ros: ros,
+    name: '/interface/position',
+    messageType: '/vision/position'
+});
+
+function topicROSPosition(x,y) {
+    x = parseInt(x);
+    y = parseInt(y);
+    var position = new ROSLIB.Message({
+        PositionX:x,
+        PositionY:y
+    });
+    TopicPosition.publish(position);
+}
 

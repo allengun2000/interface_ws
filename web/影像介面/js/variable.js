@@ -16,5 +16,8 @@ var BlueBox = [];
 var YellowBox = [];
 var WhiteBox = [];
 
-//
+//=======================================
 var ButtonFlag = 0;
+
+//=======================================
+var video_canvas = document.getElementById("playerfunction");

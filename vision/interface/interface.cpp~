@@ -109,6 +109,12 @@ void InterfaceProc::scancall(const vision::scan msg)
   dont_angle[5] = msg.Angle_range_2_3;
 }
 
+void InterfaceProc::positioncall(const vision::position msg)
+{
+  mousex=msg.PositionX;
+  mousey=msg.PositionY;
+}
+
 void InterfaceProc::Parameter_getting(const int x)
 {
 	  if(ifstream("default.yaml")){
@@ -1471,6 +1477,23 @@ void InterfaceProc::draw_Line(Mat &frame_, int obj_distance_max, int obj_distanc
   line(frame_, Point(x[0],y[0]), Point(x[1],y[1]), Scalar(255,255,0), 1);
 }
 void InterfaceProc::Draw_cross(cv::Mat &frame_,char color){
+
+
+std::string R_X;
+std::string R_Y;
+std::stringstream R_X_out;
+std::stringstream R_Y_out;
+
+std::string B_X;
+std::string B_Y;
+std::stringstream B_X_out;
+std::stringstream B_Y_out;
+
+std::string Y_X;
+std::string Y_Y;
+std::stringstream Y_X_out;
+std::stringstream Y_Y_out;
+
     switch(color){
     case 'R':
         for(int i=-2;i<=2;i++){
@@ -1483,8 +1506,11 @@ void InterfaceProc::Draw_cross(cv::Mat &frame_,char color){
             frame_.data[((Red_Item.y+0)*frame_.cols*3)+((Red_Item.x+j)*3)+1] = 255;
             frame_.data[((Red_Item.y+0)*frame_.cols*3)+((Red_Item.x+j)*3)+2] = 0;
         }
-				cv::putText(frame_, string("R"), Point(Red_Item.x,Red_Item.y), 0, 0.5, Scalar(0,0,255),1);
-        //ui->localization_ball->setGeometry(Red_Item.x,Red_Item.y-inity,300,80);
+        R_X_out << Red_Item.x;
+	R_Y_out << Red_Item.y;
+	R_X = R_X_out.str();
+	R_Y = R_Y_out.str();
+	cv::putText(frame_, "R("+R_X+","+R_Y+")", Point(Red_Item.x,Red_Item.y), 0, 0.5, Scalar(0,0,255),1);
         
     break;
     case 'B':
@@ -1498,9 +1524,12 @@ void InterfaceProc::Draw_cross(cv::Mat &frame_,char color){
             frame_.data[((Blue_Item.y+0)*frame_.cols*3)+((Blue_Item.x+j)*3)+1] = 0;
             frame_.data[((Blue_Item.y+0)*frame_.cols*3)+((Blue_Item.x+j)*3)+2] = 255;
         }
-				cv::putText(frame_, string("B"), Point(Blue_Item.x,Blue_Item.y), 0, 0.5, Scalar(255,0,0),1);
-       // ui->localization_bluedoor->setGeometry(Blue_Item.x,Blue_Item.y-inity,300,80);
-       //ui->localization_bluedoor->setText(tr("<font color=blue>B(%1 : %2)</font>").arg(Blue_Item.x).arg(Blue_Item.y));
+        B_X_out << Blue_Item.x;
+	B_Y_out << Blue_Item.y;
+	B_X = B_X_out.str();
+	B_Y = B_Y_out.str();
+	cv::putText(frame_, "B("+B_X+","+B_Y+")", Point(Blue_Item.x,Blue_Item.y), 0, 0.5, Scalar(255,0,0),1);
+       
     break;
     case 'Y':
         for(int i=-2;i<=2;i++){
@@ -1513,9 +1542,12 @@ void InterfaceProc::Draw_cross(cv::Mat &frame_,char color){
             frame_.data[((Yellow_Item.y+0)*frame_.cols*3)+((Yellow_Item.x+j)*3)+1] = 0;
             frame_.data[((Yellow_Item.y+0)*frame_.cols*3)+((Yellow_Item.x+j)*3)+2] = 0;
         }
-				cv::putText(frame_, string("Y"), Point(Yellow_Item.x,Red_Item.y), 0, 0.5, Scalar(0,255,255),1);
-        //ui->localization_yellowdoor->setGeometry(Yellow_Item.x,Yellow_Item.y-inity,300,80);
-        //ui->localization_yellowdoor->setText(tr("<font color=yellow>Y(%1 : %2)</font>").arg(Yellow_Item.x).arg(Yellow_Item.y));
+        Y_X_out << Yellow_Item.x;
+	Y_Y_out << Yellow_Item.y;
+	Y_X = Y_X_out.str();
+	Y_Y = Y_Y_out.str();
+	cv::putText(frame_, "Y("+Y_X+","+Y_Y+")", Point(Yellow_Item.x,Yellow_Item.y), 0, 0.5, Scalar(0,255,255),1);
+        
     break;
     }
 }

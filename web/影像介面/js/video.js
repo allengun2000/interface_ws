@@ -1,4 +1,4 @@
-    // namespace MJPEG { ...
+/*    // namespace MJPEG { ...
     var MJPEG = (function(module) {
         "use strict";
 
@@ -180,4 +180,63 @@
 
     //var player = new MJPEG.Player("player", "http://localhost:8080/stream?topic=/usb_cam/image_raw");
     var player = new MJPEG.Player("player", "http://" + document.getElementById("RobotIP").value + ":8080/stream?topic=/camera/image");
-    player.start();
+    player.start();*/
+
+
+//===========================================================================
+//new 
+
+Element.prototype.leftTopScreen = function() {
+    var x = this.offsetLeft;
+    var y = this.offsetTop;
+
+    var element = this.offsetParent;
+
+    while (element !== null) {
+        x = parseInt(x) + parseInt(element.offsetLeft);
+        y = parseInt(y) + parseInt(element.offsetTop);
+
+        element = element.offsetParent;
+    }
+    return new Array(x, y);
+}
+function Angle_Calculation(mouseX,mouseY) {
+    var centerX = document.getElementsByName('CenterElement')[0].value;
+    var centerY = document.getElementsByName('CenterElement')[1].value
+    y=mouseY-centerY;
+    x=mouseX-centerX;
+    var angle = Math.floor(Math.atan2(-y,x)*180*10/Math.PI)/10;
+    if(angle<0){angle+=360;}
+    document.getElementById("CameraAngle").innerText = angle;
+}
+video_canvas.addEventListener("mousedown", function(e) {
+    var flip = document.getElementById("playerfunction");
+
+    var xy = flip.leftTopScreen();
+
+    var context = flip.getContext("2d");
+
+    context.fillStyle = 'rgba(255, 255, 255, 0)';
+    context.fillRect(0, 0, 695, 493);
+
+    flip.addEventListener("click", function(event) {
+        var x = event.clientX;
+        var y = event.clientY;
+
+        document.getElementById("CameraX").innerText = x - xy[0];
+        document.getElementById("CameraY").innerText = y - xy[1];
+        Angle_Calculation(x - xy[0],y - xy[1]);
+        topicROSPosition(x - xy[0],y - xy[1]);
+        //console.log(x - xy[0], y - xy[1]);
+    });
+})
+
+function CheckCamera(check){
+    var video = document.getElementById("player");
+    if(check){
+        video.src = "http://" + document.getElementById("RobotIP").value + ":8080/stream?topic=/camera/image";
+        //video.src = "http://" + document.getElementById("RobotIP").value + ":8080/stream?topic=/usb_cam/image_raw";
+    }
+    else
+        video.src = "img/offline.png";
+}

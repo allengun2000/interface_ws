@@ -24,9 +24,11 @@
 #include "vision/color.h"
 #include "vision/Object.h"
 #include "vision/dis.h"
+#include "vision/position.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <sstream>
 #include <dynamic_reconfigure/DoubleParameter.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/Config.h>
@@ -154,19 +156,20 @@ public:
   std::string  ball_LR,blue_LR,yellow_LR;
   //vector<BYTE> ColorFile();
 
-	void imageCb(const sensor_msgs::ImageConstPtr&);
-	void ParameterButtonCall(const vision::parameterbutton);
- void colorcall(const vision::color);
+  void imageCb(const sensor_msgs::ImageConstPtr&);
+  void ParameterButtonCall(const vision::parameterbutton);
+  void colorcall(const vision::color);
   void centercall(const vision::center);
   void whitecall(const vision::white);
   void cameracall(const vision::camera);
   void blackcall(const vision::black);
   void colorbuttoncall(const vision::colorbutton);
   void scancall(const vision::scan);
-	void Parameter_getting(const int x) ;
-	void Parameter_setting(const vision::parametercheck) ;
+  void Parameter_getting(const int x) ;
+  void Parameter_setting(const vision::parametercheck) ;
+  void positioncall(const vision::position msg);
   //void object_data(const vision::Object);
-	int mosue_x,mosue_y;
+  int mosue_x,mosue_y;
   int distance_space[100];
   int distance_pixel[100];
 /////////////////init_data///////////////////////////////////////////////////
