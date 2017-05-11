@@ -253,8 +253,8 @@ InterfaceProc::InterfaceProc()
   ros::NodeHandle n("~");	
   Parameter_getting(1);	
   init_data();
-  //image_sub_ = it_.subscribe("/camera/image_raw", 1, &InterfaceProc::imageCb, this);
-  image_sub_ = it_.subscribe("usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
+  image_sub_ = it_.subscribe("/camera/image_raw", 1, &InterfaceProc::imageCb, this);
+  //image_sub_ = it_.subscribe("usb_cam/image_raw", 1, &InterfaceProc::imageCb, this);
   image_pub_threshold_ = it_.advertise("/camera/image", 1);//http://localhost:8080/stream?topic=/camera/image webfor /camera/image
   object_pub = nh.advertise<vision::Object>("/vision/object",1);
   CenterDis_pub = nh.advertise<vision::dis>("/interface/CenterDis",1);
@@ -348,8 +348,8 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
     vision::Object object_msg;
 
     if(Red_Item.distance!=0){
-      object_msg.ball_x = Red_Item.x;
-      object_msg.ball_y = Red_Item.y;
+      object_msg.ball_x = Red_Item.x-center_x;
+      object_msg.ball_y = Red_Item.y-center_y;
       object_msg.ball_LR = Red_Item.LR;
       object_msg.ball_ang = Red_Item.angle;
       object_msg.ball_dis = Omni_distance_monitor(Red_Item.distance);
@@ -359,8 +359,8 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
     }
 
     if(Blue_Item.distance!=0){
-      object_msg.blue_x = Blue_Item.x;
-      object_msg.blue_y = Blue_Item.y;
+      object_msg.blue_x = Blue_Item.x-center_x;
+      object_msg.blue_y = Blue_Item.y-center_y;
       object_msg.blue_LR = Blue_Item.LR;
       object_msg.blue_ang = Blue_Item.angle;
       object_msg.blue_dis = Omni_distance_monitor(Blue_Item.distance);
@@ -370,8 +370,8 @@ void InterfaceProc::imageCb(const sensor_msgs::ImageConstPtr& msg)
     }
 
     if(Yellow_Item.distance!=0){
-      object_msg.yellow_x = Yellow_Item.x;
-      object_msg.yellow_y = Yellow_Item.y;
+      object_msg.yellow_x = Yellow_Item.x-center_x;
+      object_msg.yellow_y = Yellow_Item.y-center_y;
       object_msg.yellow_LR = Yellow_Item.LR;
       object_msg.yellow_ang = Yellow_Item.angle;
       object_msg.yellow_dis = Omni_distance_monitor(Yellow_Item.distance);
@@ -1240,7 +1240,7 @@ void InterfaceProc::Mark_point(Mat &frame_, int distance, int angle, int x, int 
     size += 1;
 }
 double InterfaceProc::Omni_distance_monitor(double dis_pixel){
-  double Z = -1*Camera_H;
+  double Z = -1*Camera_HighMsg;
   double c = 83.125;
   double b = c*0.8722;
 
@@ -1255,9 +1255,9 @@ double InterfaceProc::Omni_distance_monitor(double dis_pixel){
   double r = atan2(f,pixel_dis*0.0099);
 
   dis = Z*(pow(b,2)-pow(c,2))*cos(r) / ((pow(b,2)+pow(c,2))*sin(r) - 2*b*c);
- /* if(dis/10 < 0 || dis/10 > 999){
+  if(dis/10 < 0 || dis/10 > 999){
     dis = 9990;
- }*/
+ }
   return dis/10;
 }
 void InterfaceProc::find_around(Mat &frame_, int distance ,int angle, int &size, int color){

@@ -48,8 +48,8 @@
                             <table>
                                 <tr width="100%" height="50%">
                                     <td>
-                                        <div class="auto">
-                                            <input type="radio" id="CameraButton" name="ButtonElement" checked="checked" onclick="topicROSParameterButton(1);ParameterbuttonTransfer(1)" />
+                                        <div class="auto" >
+                                            <input type="radio" id="CameraButton" name="ButtonElement" checked="checked" autocomplete="on" onclick="topicROSParameterButton(1);ParameterbuttonTransfer(1)" />
                                             <label id="CameraButton" for="CameraButton">Camera</label>
                                         </div>
                                     </td>
@@ -75,7 +75,7 @@
                                     </td> -->
                                     <td>
                                         <div class="auto">
-                                            <input type="radio" id="ColorButton" name="ButtonElement" />
+                                            <input type="radio" id="ColorButton" name="ButtonElement" onclick="topicROSParameterButton(8)"  />
                                             <label id="ColorButton" for="ColorButton">Color</label>
                                         </div>
                                     </td>
@@ -190,7 +190,7 @@
                                             <label>Dis : </label>
                                         </td>
                                         <td>
-                                            <label>Num</label>
+                                            <label name="CenterDisLabel">Num</label>
                                         </td>
                                         </td>
                                     </tr>
@@ -230,7 +230,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <input name="ScanElement" class="RobotRange3" type="range" min="0" max="100" value="0" oninput="showValue(this.value,'ScanLabel',1);topicScanTransfer()" onchange="topicROSCheckButton(this.value);ParameterScanTransfer2()"  />
+                                            <input name="ScanElement" class="RobotRange3" type="range" min="3" max="100" value="0" oninput="showValue(this.value,'ScanLabel',1);topicScanTransfer()" onchange="topicROSCheckButton(this.value);ParameterScanTransfer2()"  />
                                         </td>
                                     </tr>
                                     <tr>
@@ -531,10 +531,10 @@
                                     <table>
                                         <tr>
                                             <td>
-                                                <button id="sendHSV" type="button" class="Button" onmousedown="showHsvColor();ParameterHSVTransfer();topicROSCheckButton(value);ParameterHSVTransfer()">Save</button>
+                                                <button id="sendHSV" type="button" class="Button" onmousedown="showHsvColor();ParameterHSVTransfer();topicROSCheckButton(value);ParameterHSVTransfer();topicROSParameterButton(4);ParameterbuttonTransfer(4)"">Save</button>
                                             </td>
                                             <td>
-                                                <select id="HSVSelect" onchange="ColorRecord(this.value)">
+                                                <select id="HSVSelect" onchange="ColorRecord(this.value);topicROSCheckButton(value)">
                                                     <option value = "0">Orange</option>
                                                     <option value = "1">Green</option>
                                                     <option value = "2">Blue</option>
@@ -568,7 +568,7 @@
                                                 <label>Angle</label>
                                             </td>
                                             <td class="Slider1Input">
-                                                <input name="WhiteElement" type="range" min="0" max="360" value="0" oninput="showValue(this.value,'WhiteLabel',1);topicWhiteTransfer()" onchange="topicROSCheckButton(this.value);ParameterWhite_angleTransfer()"  />
+                                                <input name="WhiteElement" type="range" min="5" max="360" value="0" oninput="showValue(this.value,'WhiteLabel',1);topicWhiteTransfer()" onchange="topicROSCheckButton(this.value);ParameterWhite_angleTransfer()"  />
                                             </td>
                                             <td>
                                                 <label name="WhiteLabel">num</label>
@@ -706,7 +706,7 @@
                             </div>
                         </form>
                         <div id="InterfaceCamera" class="form-group">
-                             <img id="player" src="http://127.0.0.1:8080/stream?topic=/camera/image">
+                             <img id="player" src="img/offline.png">
 							<!-- 
                             <canvas id="player">
                                 Your browser sucks.
@@ -719,12 +719,14 @@
                         <div id="InterfaceCheckCamera" class="form-group">
                             <div>
                                 <label>
-                                    <input id="CameraSwitch" type="checkbox" checked="checked"> Camera </label>
+                                    <input id="CameraSwitch" type="checkbox" onclick="CheckCamera(this.checked);"> Camera </label>
                                 &nbsp;
                                 <label>X = </label>
                                 <label id="CameraX"></label>
                                 <label>Y = </label>
                                 <label id="CameraY"></label>
+                                <label>Angle = </label>
+                                <label id="CameraAngle"></label>
                             </div>
                         </div>
                     </div>
@@ -833,16 +835,19 @@
     $("#ParameterBlack").hide();
 
     $("#HSVButton").click(function() {
+        ButtonFlag = 4;
         $("#ParameterHSV").show();
         $("#ParameterWhite").hide();
         $("#ParameterBlack").hide();
     });
     $("#WhiteButton").click(function() {
+        ButtonFlag = 5;
         $("#ParameterHSV").hide();
         $("#ParameterWhite").show();
         $("#ParameterBlack").hide();
     });
     $("#BlackButton").click(function() {
+        ButtonFlag = 6;
         $("#ParameterHSV").hide();
         $("#ParameterWhite").hide();
         $("#ParameterBlack").show();

@@ -230,7 +230,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <input name="ScanElement" class="RobotRange3" type="range" min="0" max="100" value="0" oninput="showValue(this.value,'ScanLabel',1);topicScanTransfer()" onchange="topicROSCheckButton(this.value);ParameterScanTransfer2()"  />
+                                            <input name="ScanElement" class="RobotRange3" type="range" min="3" max="100" value="0" oninput="showValue(this.value,'ScanLabel',1);topicScanTransfer()" onchange="topicROSCheckButton(this.value);ParameterScanTransfer2()"  />
                                         </td>
                                     </tr>
                                     <tr>
@@ -286,7 +286,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <input name="ScanElement" class="RobotRange3" type="range" min="0" max="240" value="0" oninput="showValue(this.value,'ScanLabel',5);topicScanTransfer()" onchange="topicROSCheckButton(this.value);ParameterScanTransfer6()"  />
+                                            <input name="ScanElement" class="RobotRange3" type="range" min="0" max="260" value="0" oninput="showValue(this.value,'ScanLabel',5);topicScanTransfer()" onchange="topicROSCheckButton(this.value);ParameterScanTransfer6()"  />
                                         </td>
                                     </tr>
                                 </table>
@@ -531,10 +531,10 @@
                                     <table>
                                         <tr>
                                             <td>
-                                                <button id="sendHSV" type="button" class="Button" onmousedown="showHsvColor();ParameterHSVTransfer();topicROSCheckButton(value);ParameterHSVTransfer()">Save</button>
+                                                <button id="sendHSV" type="button" class="Button" onmousedown="showHsvColor();ParameterHSVTransfer();topicROSCheckButton(value);ParameterHSVTransfer();topicROSParameterButton(4);ParameterbuttonTransfer(4)"">Save</button>
                                             </td>
                                             <td>
-                                                <select id="HSVSelect" onchange="ColorRecord(this.value)">
+                                                <select id="HSVSelect" onchange="ColorRecord(this.value);topicROSCheckButton(value)">
                                                     <option value = "0">Orange</option>
                                                     <option value = "1">Green</option>
                                                     <option value = "2">Blue</option>
